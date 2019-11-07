@@ -1,0 +1,132 @@
+#+TITLE: Comparing test and production behavior for dynamic languages
+#+SUBTITLE: Internship at KTH from May 13, 2019 to July 15, 2019
+#+AUTHOR: Quentin Le Dilavrec\inst{1}, supervised by Benoit Baudry\inst{2}
+#+LaTeX_CLASS: llncs
+# #+LaTeX_CLASS_OPTIONS: [runningheads]
+#+OPTIONS: title:t toc:nil
+#+LANGUAGE: american
+#+EMAIL:     (concat "quentin.le-dilavrec" at-sign "ens-rennes.fr")
+#+SEQ_TODO: APPT(a) TODO(t) NEXT(n) STARTED(s) WAITING(w) HALF(h) APPT(a) | DONE(d) CANCELLED(c) DEFERRED(f)
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="org.css"/>
+#+LATEX_HEADER: \usepackage{titletoc}
+#+LATEX_HEADER: \usepackage[utf8]{inputenc}
+#+LATEX_HEADER: \usepackage[T1]{fontenc}
+#+LATEX_HEADER: \usepackage{graphicx}
+#+LATEX_HEADER: \usepackage{relsize}
+#+LATEX_HEADER: \usepackage{tikz}
+# #+LATEX_HEADER: \renewcommand\UrlFont{\color{blue}\rmfamily}
+#+LATEX_HEADER: \usepackage[american]{babel}
+#+LATEX_HEADER: \usepackage{minted}
+#+LATEX_HEADER: \usepackage{mdframed}
+#+LATEX_HEADER: \usepackage{color}
+# #+LATEX_HEADER: \usepackage[a-1b]{pdfx}
+# #+LATEX_HEADER: \usepackage{hyperref}
+#+LATEX_HEADER: \usepackage[normalem]{ulem}
+#+LATEX_HEADER: \tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt        
+# #+LATEX_HEADER: \institute{\inst{1} Affil1 \and \inst{2} Affil2 \and \inst{3} Affil3}
+ # \inst{2} \and Author3 \inst{3}}
+#+MACRO: color @@latex:{\color{$1}@@$2@@latex:}@@
+# #+LATEX_HEADER: \def\email#1{\texttt{#1}}
+#+LATEX_HEADER: \institute{ Univ. Rennes \email{Quentin.Le-dilavrec@ens-rennes.fr} \and KTH \email{baudry@kth.se}}
+
+#+LATEX_HEADER: \usepackage{subfig}
+
+# #+LATEX_HEADER: \usepackage{showframe}
+
+
+# #+Begin_export latex
+# \author{Author1 \and Author2}
+# \maketitle
+# #+END_EXPORT
+
+#+BEGIN_abstract
+#+END_abstract
+nothing
+# * References                                                         :ignore:
+bibliographystyle:plain
+bibliography:references.bib
+** links                                                  :noexport:
+- [[https://hal.archives-ouvertes.fr/hal-02192489/document][Djamel E. Khelladi, Roland Kretschmer, Alexander Egyed: Change Propagation-based and Composition-based Co-evolution of Transformations with Evolving Metamodels. MODELS 2018.]]
+- [[https://www.sciencedirect.com/science/article/pii/S016412121730198X][Djamel E. Khelladi, Reda Bendraou, Regina Hebig, Marie-Pierre Gervais: A semi-automatic maintenance and co-evolution of OCL constraints with (meta)model evolution. JSS 2017.]]
+- [[https://onlinelibrary.wiley.com/doi/pdf/10.1002/stvr.1527?casa_token=8NV-Lu7VHMkAAAAA:cxmcUNC2hvcaHRKAykk36t2lBr7ki-fBQYe60Ca59QkL5RZKZeXwRVvbW2p0wWDOaUT2G0OWw5yRfJ8][Mirzaaghaei, M., Pastore, F., & Pezzè, M. Automatic test case evolution. Software Testing, Verification and Reliability, 24(5), 386-411. 2014.]]
+- [[https://arxiv.org/pdf/1709.09029][Levin, S., & Yehudai, A. The co-evolution of test maintenance and code maintenance through the lens of fine-grained semantic changes. In IEEE International Conference on Software Maintenance and Evolution (ICSME) (pp. 35-46). IEEE. 2017.]]
+- [[https://link.springer.com/article/10.1007/s10664-010-9143-7][Zaidman, A., Van Rompaey, B., van Deursen, A., & Demeyer, S. Studying the co-evolution of production and test code in open source and industrial developer test processes through repository mining. Empirical Software Engineering Journal, 16(3), 325-364. 2011.]]
++ [[https://www.researchgate.net/profile/Kim_Mens/publication/226433519_Co-Evolution_of_Object-Oriented_Software_Design_and_Implementation/links/0fcfd50772447c85d2000000/Co-Evolution-of-Object-Oriented-Software-Design-and-Implementation.pdf][Co-evolution of object-oriented software design and implementation, T D'Hondt, K De Volder, K Mens, R Wuyts - Software Architectures and …, 2002 - Springer]] more
++ [[http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.149.2832&rep=rep1&type=pdf][Mining software repositories to study co-evolution of production & test code, A Zaidman, B Van Rompaey, S Demeyer… - … on software testing …, 2008 - ieeexplore.ieee.org]] more
+
+*** From M1 (look at m1 notebook for in depth reviews)
+- [[https://doi.org/10.1016/j.infsof.2019.05.008][On the Use of Usage Patterns from Telemetry Data for Test Case Prioritization]] Tests improvements
+- [[https://people.cs.umass.edu/~brun/pubs/pubs/Wang17icst.pdf][Behavioral Execution Comparison: Are Tests Representative of Field Behavior?]] paper using synoptic
+- [[https://github.com/INRIA/intertrace]]
+- https://people.inf.ethz.ch/suz/publications/natural.pdf https://github.com/labri-progress/naturalness-js application of natural language processing to computer software
+- [[https://arxiv.org/pdf/1906.01463.pdf][Bridging the Gap between Unit Test Generation and System Test Generation]] feedback loop
+- [[http://ceur-ws.org/Vol-971/paper21.pdf]]
+- http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=877A01775995830BB127116FB11BAB49?doi=10.1.1.323.3411&rep=rep1&type=pdf
+- [[https://cs.uwaterloo.ca/~m2nagapp/courses/CS846/1171/papers/hindle_icse12.pdf][Lossless compaction of model execution traces]]
+- [[https://livablesoftware.com/conflictjs-javascript-libraries-conflicts/]]
+* Journal                                                         :noexport:
+
+** [2019-10-18 Fri]
+*** Meeting with Djamel and Arnaud
+Discussion on the internship subject in relation to Research Questions (to focus objectives) 
+then on the bibliographic report (constraints from head of M2 and methodology).
+For the methodology, the reading of paper is standard see RAS module and Martin Quinson personal page.
+Moreover I should use some search engine to find paper in a somewhat reproducible way then filter,
+exploring through related works is also useful.
+*** TODO test refactoring miner on some js
+- just want move function at this point
+*** HALF read [[https://hal.archives-ouvertes.fr/hal-02192489/document][Djamel E. Khelladi, Roland Kretschmer, Alexander Egyed: Change Propagation-based and Composition-based Co-evolution of Transformations with Evolving Metamodels. MODELS 2018.]]
+Diff on some kind of extended UML models (OCL models) to mine transformation rules.
+Those rules can be composed and applied in particular patterns to properties.
+*** TODO read [[https://www.sciencedirect.com/science/article/pii/S016412121730198X][Djamel E. Khelladi, Reda Bendraou, Regina Hebig, Marie-Pierre Gervais: A semi-automatic maintenance and co-evolution of OCL constraints with (meta)model evolution. JSS 2017.]]
+challenges of OCL:
+> the existence of multiple and semantically different resolutions
+pas consistent avec UML dans certains cas (nombres de refs).
+> a resolution can be applicable only to a subset of OCL constraints
+*** TODO read [[https://onlinelibrary.wiley.com/doi/pdf/10.1002/stvr.1527?casa_token=8NV-Lu7VHMkAAAAA:cxmcUNC2hvcaHRKAykk36t2lBr7ki-fBQYe60Ca59QkL5RZKZeXwRVvbW2p0wWDOaUT2G0OWw5yRfJ8][Mirzaaghaei, M., Pastore, F., & Pezzè, M. Automatic test case evolution. Software Testing, Verification and Reliability, 24(5), 386-411. 2014.]]
+Evolution of the tests of a given class based on the tests of the parent and sibling class.
+*** TODO read [[https://arxiv.org/pdf/1709.09029][Levin, S., & Yehudai, A. The co-evolution of test maintenance and code maintenance through the lens of fine-grained semantic changes. In IEEE International Conference on Software Maintenance and Evolution (ICSME) (pp. 35-46). IEEE. 2017.]]
+Very large dataset.
+> Our work [2,3] showed that semantic changes (fine-grained source code changes [4,5]), 
+> such as method removed, field added, are statistically significant in the context of software code maintenance
+see to diferrent vision of code evolution:
+- how to make evolution append
+- what kind of evolution appened
+
+Big data approach with spark.
+
+- Corrective :: fix faults
+- Perfective :: improve sys and design
+- Adaptive :: introduce new features
+*** TODO read [[https://link.springer.com/article/10.1007/s10664-010-9143-7][Zaidman, A., Van Rompaey, B., van Deursen, A., & Demeyer, S. Studying the co-evolution of production and test code in open source and industrial developer test processes through repository mining. Empirical Software Engineering Journal, 16(3), 325-364. 2011.]]
+
+*** HALF read [[http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.149.2832&rep=rep1&type=pdf][Mining software repositories to study co-evolution of production & test code, A Zaidman, B Van Rompaey, S Demeyer… - … on software testing …, 2008 - ieeexplore.ieee.org]]
+Don't see the point of those RQ, very prospective.
+Extract data from commits
+Try to classify the kind of action applied to code for a given commit.
+** [2019-10-19 Sat]
+*** STARTED How to detect, in an acceptable delay, tests impacted by changes in the code?
+
+*** STARTED How to automatically evolve, is possible, tests based on code base changes?
+
+*** HALF look at semantic by github
+Not very precise on calls.
+Does not work well with JSX thus not well with many gutenberg packages.
+Linking chained calls to their definition seam to be a pathological case for symbolic/static analysis.
+It is easily solved by logging the last element of the stack trace when logging a call to a function from the function definition.
+Getting this information can be conditional, only add the instrumentation when missing information.
+Overall it is much more brittle than the standard typescript compiler
+* Emacs Settings                                                   :noexport:
+#    (ox-extras-activate '(ignore-headlines))
+Local Variables:
+eval:    (setq org-confirm-babel-evaluate nil)
+eval:    (org-babel-do-load-languages 'org-babel-load-languages '( (shell . t) (R . t) (perl . t) (ditaa . t) ))
+eval:    (setq org-latex-listings 'minted)
+eval:    (add-to-list 'org-latex-packages-alist '("" "minted"))
+eval:    (setq org-src-fontify-natively t)
+eval:    (setq org-image-actual-width '(600))
+eval:    (unless (boundp 'org-latex-classes) (setq org-latex-classes nil))
+eval:    (setq org-latex-with-hyperref nil)
+eval:    (add-to-list 'org-latex-classes '("llncs" "\\documentclass{llncs}\n \[NO-DEFAULT-PACKAGES]\n \[EXTRA]\n"  ("\\section{%s}" . "\\section*{%s}") ("\\subsection{%s}" . "\\subsection*{%s}")                       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")                       ("\\paragraph{%s}" . "\\paragraph*{%s}")                       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+eval:    (setq org-latex-pdf-process (list "latexmk -bibtex -shell-escape -f -pdf %F"))
+End:
