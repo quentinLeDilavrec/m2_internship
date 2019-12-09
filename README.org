@@ -1,10 +1,10 @@
-#+TITLE: Comparing test and production behavior for dynamic languages
-#+SUBTITLE: Internship at KTH from May 13, 2019 to July 15, 2019
-#+AUTHOR: Quentin Le Dilavrec\inst{1}, supervised by Benoit Baudry\inst{2}
+#+TITLE: Etude sur la co-evolution logiciel
+# #+SUBTITLE: Internship at KTH from May 13, 2019 to July 15, 2019
+#+AUTHOR: Quentin Le Dilavrec\inst{1}
 #+LaTeX_CLASS: llncs
 # #+LaTeX_CLASS_OPTIONS: [runningheads]
 #+OPTIONS: title:t toc:nil
-#+LANGUAGE: american
+#+LANGUAGE: french
 #+EMAIL:     (concat "quentin.le-dilavrec" at-sign "ens-rennes.fr")
 #+SEQ_TODO: APPT(a) TODO(t) NEXT(n) STARTED(s) WAITING(w) HALF(h) APPT(a) | DONE(d) CANCELLED(c) DEFERRED(f)
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="org.css"/>
@@ -40,20 +40,100 @@
 # #+END_EXPORT
 
 #+BEGIN_abstract
+Dans cette étude nous allons tenté d'établir l'état de l'art de la co-évolution.
 #+END_abstract
-nothing
+* Introduction
+* Motivations
+Automatiser le développement logiciel.
+Réduire les erreurs humaines.
+* Test logiciel
+Détécter et corriger des erreurs dans une implementation.
+Spécifier des fonctionnalités
+Pas exhaustif comparé à de l'analyse symbolique, mais plus facile à mettre en oeuvre.
+Faciliter la spécification de fonctionalités complexes tout en laissant une certaine flexibilité dans l'implementation de cette dernière.
+* Co-evolution (change propagation)
+Faciliter et automatiser l'évolution d'une spécification
+par réaction à une modification d'un model ou de code.
+Deux familles de co-evolutions:
+- co-évolution de models et de contraintes (UML et OCL)
+- co-évolution de code et de tests
+| type     | changement  | impact on compile/test/validity | évolution                                   | typescipt     | Eclipse JAVA | spoon | semantic |
+|----------+-------------+---------------------------------+---------------------------------------------+---------------+--------------+-------+----------|
+| atomique | addition    | x/x/v                           | génération                                  | x/x           |              |       |          |
+|          | suppréssion | v/x/x                           |                                             | detect/repair |              |       |          |
+| composé  | déplacement | v/x/v                           | déplacement ou mise à jour de l'importation | v/x           |              |       |          |
+|          | renomage    |                                 | déplacement ou mise à jour de l'importation | v/x           |              |       |          |
+** classification des changements
+*** niveau d'abstraction
+- dossier
+  - fichier
+    - class/objet/fonction
+      - methode/class/objet/fonction
+        - paramètre
+        - branche
+          - instruction
+*** granularité
+(from Khelladi)
+- changement atomique
+  - addition
+  - suppréssion
+- changement composé
+  - déplacement
+  - renomage
+*** type de changement
+(from [levin])
+- Corrective :: fix faults
+- Perfective :: improve sys and design
+- Adaptive :: introduce new features
+** classification des évolutions
+*** réparation
+modifie un test pour passer la compilation, le runtime
+*** génération
+crée de nouveaux tests à partir des anciens par diverse methodes d'éxploration (génétique, regression, etc )
+*** supression
+enlève ou simplifie des testes/du code
+* Analyse static
+Nécéssite des informations de type (annoté ou inféré).
+Peut verifier des propiété sur des domaines infini de manière exaustives.
+Efficasse sur des programmes simples mais pouvant accépté un grand nombre d'entrées.
+Typing, even languages that don't have types can start to use type rules e.g. monotype in C with everything is an int, can check for null déréferencing that is dereferencing 0.
+In program analysis we always have a type Top and a type Bottom, making type analysis more robust and flexible in practice (incremental typing/ type inference).
+
+spoon
+typescript
+semantic
+* Analyse dynamic
+Particulièrement adapté au langages fortement dynamiques et peu typé.
+Ne peut pas fournir de garanties absolue sur un domaine infini.
+Au plus proche de l'utilisation réelle du programme.
+Efficasse sur des programmes potentiellements complexes mais acceptant peut d'entrées.
+JSFlow
+* Analyse hybride
+Dans beaucoup de future work d'articles du domaine, et dans quelques contribution mineures.
+Supporte l'analyse statique en apportant des informations facilements accessibles au runtime.
+Supporte l'analyse dynamique en l'orientant vers les points sensibles détécter au cours de l'analyse statique.
+Se servir des tests pour récolter de l'information au runtime et améliorer des déduction de l'analyse statique.
+Se servir de l'analyse statique pour détecter des morceau de programmes sensibles et ansi les tester et les instrumenter pour mieux les comprendre et détecter les bugs.
+* Test par muttations
+Changer la syntaxe d'un programme tout en tentant concever la même semantique de façon à tester des cas particuliers et rendre le code plus robuste. 
 # * References                                                         :ignore:
 bibliographystyle:plain
 bibliography:references.bib
 ** links                                                  :noexport:
-- [[https://hal.archives-ouvertes.fr/hal-02192489/document][Djamel E. Khelladi, Roland Kretschmer, Alexander Egyed: Change Propagation-based and Composition-based Co-evolution of Transformations with Evolving Metamodels. MODELS 2018.]]
-- [[https://www.sciencedirect.com/science/article/pii/S016412121730198X][Djamel E. Khelladi, Reda Bendraou, Regina Hebig, Marie-Pierre Gervais: A semi-automatic maintenance and co-evolution of OCL constraints with (meta)model evolution. JSS 2017.]]
-- [[https://onlinelibrary.wiley.com/doi/pdf/10.1002/stvr.1527?casa_token=8NV-Lu7VHMkAAAAA:cxmcUNC2hvcaHRKAykk36t2lBr7ki-fBQYe60Ca59QkL5RZKZeXwRVvbW2p0wWDOaUT2G0OWw5yRfJ8][Mirzaaghaei, M., Pastore, F., & Pezzè, M. Automatic test case evolution. Software Testing, Verification and Reliability, 24(5), 386-411. 2014.]]
-- [[https://arxiv.org/pdf/1709.09029][Levin, S., & Yehudai, A. The co-evolution of test maintenance and code maintenance through the lens of fine-grained semantic changes. In IEEE International Conference on Software Maintenance and Evolution (ICSME) (pp. 35-46). IEEE. 2017.]]
-- [[https://link.springer.com/article/10.1007/s10664-010-9143-7][Zaidman, A., Van Rompaey, B., van Deursen, A., & Demeyer, S. Studying the co-evolution of production and test code in open source and industrial developer test processes through repository mining. Empirical Software Engineering Journal, 16(3), 325-364. 2011.]]
-+ [[https://www.researchgate.net/profile/Kim_Mens/publication/226433519_Co-Evolution_of_Object-Oriented_Software_Design_and_Implementation/links/0fcfd50772447c85d2000000/Co-Evolution-of-Object-Oriented-Software-Design-and-Implementation.pdf][Co-evolution of object-oriented software design and implementation, T D'Hondt, K De Volder, K Mens, R Wuyts - Software Architectures and …, 2002 - Springer]] more
+- [[file:../papers/change_propa_compo_co-evo.pdf][pdf]] [[https://hal.archives-ouvertes.fr/hal-02192489/document][Djamel E. Khelladi, Roland Kretschmer, Alexander Egyed: Change Propagation-based and Composition-based Co-evolution of Transformations with Evolving Metamodels. MODELS 2018.]]
+- [[file:../papers/semi-auto_maintenance_co-evo.pdf][pdf]] [[https://www.sciencedirect.com/science/article/pii/S016412121730198X][Djamel E. Khelladi, Reda Bendraou, Regina Hebig, Marie-Pierre Gervais: A semi-automatic maintenance and co-evolution of OCL constraints with (meta)model evolution. JSS 2017.]]
+- [[file:../papers/Automatique_test_case_evolution.pdf][pdf]] [[https://onlinelibrary.wiley.com/doi/pdf/10.1002/stvr.1527?casa_token=8NV-Lu7VHMkAAAAA:cxmcUNC2hvcaHRKAykk36t2lBr7ki-fBQYe60Ca59QkL5RZKZeXwRVvbW2p0wWDOaUT2G0OWw5yRfJ8][Mirzaaghaei, M., Pastore, F., & Pezzè, M. Automatic test case evolution. Software Testing, Verification and Reliability, 24(5), 386-411. 2014.]]
+- [[file:../papers/co-evo_test-code_maint_fine-grain.pdf][pdf]][[https://arxiv.org/pdf/1709.09029][ Levin, S., & Yehudai, A. The co-evolution of test maintenance and code maintenance through the lens of fine-grained semantic changes. In IEEE International Conference on Software Maintenance and Evolution (ICSME) (pp. 35-46). IEEE. 2017.]]
+- [[file:../papers/Mining Software Repositories to Study Co-Evolution of Production & Test Cod.pdf][pdf]] [[https://link.springer.com/article/10.1007/s10664-010-9143-7][Zaidman, A., Van Rompaey, B., van Deursen, A., & Demeyer, S. Studying the co-evolution of production and test code in open source and industrial developer test processes through repository mining. Empirical Software Engineering Journal, 16(3), 325-364. 2011.]]
++ [[file:../papers/Co-Evolution_of_Object-Oriented_Software_Design_an.pdf][pdf]] [[https://www.researchgate.net/profile/Kim_Mens/publication/226433519_Co-Evolution_of_Object-Oriented_Software_Design_and_Implementation/links/0fcfd50772447c85d2000000/Co-Evolution-of-Object-Oriented-Software-Design-and-Implementation.pdf][Co-evolution of object-oriented software design and implementation, T D'Hondt, K De Volder, K Mens, R Wuyts - Software Architectures and …, 2002 - Springer]] more
 + [[http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.149.2832&rep=rep1&type=pdf][Mining software repositories to study co-evolution of production & test code, A Zaidman, B Van Rompaey, S Demeyer… - … on software testing …, 2008 - ieeexplore.ieee.org]] more
-
++ [[file:../papers/more/mirshokraie-icst13.pdf][pdf]] [[http://blogs.ubc.ca/karthik/files/2013/01/mirshokraie-icst13.pdf][Mirshokraie, Shabnam, Ali Mesbah, and Karthik Pattabiraman. "Efficient JavaScript mutation testing." 2013 IEEE Sixth International Conference on Software Testing, Verification and Validation. IEEE, 2013.]]
++ [[file:../papers/more/Survey_DA_TestGen_js.pdf][pdf]] [[http://cs.staff.au.dk/~amoeller/papers/jssurvey/journal.pdf][Andreasen, Esben, et al. "A survey of dynamic analysis and test generation for JavaScript." ACM Computing Surveys (CSUR) 50.5 (2017): 66.]]
++ [[file:../papers/more/Gyimesi-ICST-2019.pdf][pdf]] [[https://www.researchgate.net/profile/Andrea_Stocco2/publication/333681142_BUGSJS_A_Benchmark_of_JavaScript_Bugs/links/5cff58fda6fdccd13091d886/BUGSJS-A-Benchmark-of-JavaScript-Bugs.pdf][Gyimesi, Péter, et al. "Bugsjs: A benchmark of javascript bugs." 2019 12th IEEE Conference on Software Testing, Validation and Verification (ICST). IEEE, 2019.]]
++ [[file:../papers/more/pldi275-richards.pdf][pdf]] [[https://plg.uwaterloo.ca/~dynjs/pldi275-richards.pdf][Richards, Gregor, et al. "An analysis of the dynamic behavior of JavaScript programs." ACM Sigplan Notices. Vol. 45. No. 6. ACM, 2010.]]
+*** hs
+- A Trusted Mechanised JavaScript Specification
+- Capture-Replay vs. Programmable Web Testing: An Empirical Assessment during Test Case Evolution
 *** From M1 (look at m1 notebook for in depth reviews)
 - [[https://doi.org/10.1016/j.infsof.2019.05.008][On the Use of Usage Patterns from Telemetry Data for Test Case Prioritization]] Tests improvements
 - [[https://people.cs.umass.edu/~brun/pubs/pubs/Wang17icst.pdf][Behavioral Execution Comparison: Are Tests Representative of Field Behavior?]] paper using synoptic
@@ -65,7 +145,6 @@ bibliography:references.bib
 - [[https://cs.uwaterloo.ca/~m2nagapp/courses/CS846/1171/papers/hindle_icse12.pdf][Lossless compaction of model execution traces]]
 - [[https://livablesoftware.com/conflictjs-javascript-libraries-conflicts/]]
 * Journal                                                         :noexport:
-
 ** [2019-10-18 Fri]
 *** Meeting with Djamel and Arnaud
 Discussion on the internship subject in relation to Research Questions (to focus objectives) 
@@ -73,49 +152,217 @@ then on the bibliographic report (constraints from head of M2 and methodology).
 For the methodology, the reading of paper is standard see RAS module and Martin Quinson personal page.
 Moreover I should use some search engine to find paper in a somewhat reproducible way then filter,
 exploring through related works is also useful.
-*** TODO test refactoring miner on some js
+*** TODO test a refactoring miner on some js
 - just want move function at this point
-*** HALF read [[https://hal.archives-ouvertes.fr/hal-02192489/document][Djamel E. Khelladi, Roland Kretschmer, Alexander Egyed: Change Propagation-based and Composition-based Co-evolution of Transformations with Evolving Metamodels. MODELS 2018.]]
-Diff on some kind of extended UML models (OCL models) to mine transformation rules.
-Those rules can be composed and applied in particular patterns to properties.
-*** TODO read [[https://www.sciencedirect.com/science/article/pii/S016412121730198X][Djamel E. Khelladi, Reda Bendraou, Regina Hebig, Marie-Pierre Gervais: A semi-automatic maintenance and co-evolution of OCL constraints with (meta)model evolution. JSS 2017.]]
+*** HALF read [[https://www.sciencedirect.com/science/article/pii/S016412121730198X][Djamel E. Khelladi, Reda Bendraou, Regina Hebig, Marie-Pierre Gervais: A semi-automatic maintenance and co-evolution of OCL constraints with (meta)model evolution. JSS 2017.]]
 challenges of OCL:
 > the existence of multiple and semantically different resolutions
 pas consistent avec UML dans certains cas (nombres de refs).
 > a resolution can be applicable only to a subset of OCL constraints
-*** TODO read [[https://onlinelibrary.wiley.com/doi/pdf/10.1002/stvr.1527?casa_token=8NV-Lu7VHMkAAAAA:cxmcUNC2hvcaHRKAykk36t2lBr7ki-fBQYe60Ca59QkL5RZKZeXwRVvbW2p0wWDOaUT2G0OWw5yRfJ8][Mirzaaghaei, M., Pastore, F., & Pezzè, M. Automatic test case evolution. Software Testing, Verification and Reliability, 24(5), 386-411. 2014.]]
+
+The 2018 paper is more mature.
+*** HALF read [[https://hal.archives-ouvertes.fr/hal-02192489/document][Djamel E. Khelladi, Roland Kretschmer, Alexander Egyed: Change Propagation-based and Composition-based Co-evolution of Transformations with Evolving Metamodels. MODELS 2018.]]
+Diff on some kind of extended UML models (with OCL constraints) to mine transformation rules.
+Those rules can be composed and applied in particular patterns to properties.
+change propagation ~ co-evolution
+**** lesson
+     diff should not be enough to grasp composed changes (with a naive diff a move is an add and a del)
+**** interesting
+Overall approach shown in figure 3 is realy interesting,
+might be adapted to what I want to do globaly, need to be adapted to code
+Taking tables and I will try to add things on code analysis and dynamic analysis.
+*** HALF read [[https://onlinelibrary.wiley.com/doi/pdf/10.1002/stvr.1527?casa_token=8NV-Lu7VHMkAAAAA:cxmcUNC2hvcaHRKAykk36t2lBr7ki-fBQYe60Ca59QkL5RZKZeXwRVvbW2p0wWDOaUT2G0OWw5yRfJ8][Mirzaaghaei, M., Pastore, F., & Pezzè, M. Automatic test case evolution. Software Testing, Verification and Reliability, 24(5), 386-411. 2014.]]
+TestCareAssitant
+Good intro
+This article introduces eight test evolution algorithms that automatically generate test cases for
+the identified test evolution scenarios. The algorithms take as input the original and the modified
+versions of the software and the set of test cases used to validate the original version, and generate
+a set of test cases for the modified version.
+
 Evolution of the tests of a given class based on the tests of the parent and sibling class.
-*** TODO read [[https://arxiv.org/pdf/1709.09029][Levin, S., & Yehudai, A. The co-evolution of test maintenance and code maintenance through the lens of fine-grained semantic changes. In IEEE International Conference on Software Maintenance and Evolution (ICSME) (pp. 35-46). IEEE. 2017.]]
+**** background
+Model based techniques use abstract models of either the software behaviour or its environment to
+generate test cases [5], while code based approaches generate test cases from the software source
+code [6, 7]. Although approaches of both types generate executable test cases with oracles that
+checks the runtime software behaviour, the two classes of approaches present different practical
+limitations: model based approaches need specifications that require much effort to be developed
+and kept up to date, while code based approaches produce test cases that may not be easily readable
+and may be hard to evaluate for developers [8].
+
+5. Utting M, Pretschner A, Legeard B. A taxonomy of model-based testing approaches. Software Testing, Verification
+and Reliability August 2012; 22(5):297–312. DOI: 10.1002/stvr.456.
+6. Ali S, Briand LC, Hemmati H, Paanesar-Walawege RK. A systematic review of the application and empirical investigation
+of search-based test-case generation. IEEE Transactions on Software Engineering 2010; 36(6):742 –762.
+DOI: 10.1109/TSE.2009.52.
+7. Cadar C, Godefroid P, Khurshid S, P˘as˘areanu CS, Sen K, Tillmann N, Visser W. Symbolic execution for software
+testing in practice: preliminary assessment. ICSE’11: Proceedings of the 33rd International Conference on Software
+Engineering, Waikiki, Honoulu, Hawaii, USA, ACM, 2011; 1066–1071. DOI: 10.1145/1985793.1985995.
+8. Jagannath V, Lee YY, Daniel B, Marinov D. Reducing the costs of bounded-exhaustive testing. FASE ’09: Proceedings
+of the 12th International Conference on Fundamental Approaches to Software Engineering, Amsterdam,
+Springer-Verlag, 2009; 171–185. DOI:10.1007/978-3-642-00593-0_12.
+**** related work
+Automatic test case generation techniques usually do not identify the setup actions necessary to
+execute the test cases, and tend to generate a huge amount of test cases without distinguishing among
+valid and invalid inputs thus causing many false alarms. Furthermore, automatically generated test
+inputs are often hard to read and maintain, and their practical applicability is limited to either the
+regression testing or the detection of unexpected exception conditions [4].
+
+4. Robinson B, Ernst MD, Perkins JH, Augustine V, Li N. Scaling up automated test generation: automatically
+generating maintainable regression unit tests for programs. ASE’11: Proceedings of the 26th International Conference
+on Automated Software Engineering, Lawrence, KS, USA, IEEE Computer Society, 2011; 23 –32. DOI:
+10.1109/ASE.2011.6100059.
+
+*** DONE read [[https://arxiv.org/pdf/1709.09029][Levin, S., & Yehudai, A. The co-evolution of test maintenance and code maintenance through the lens of fine-grained semantic changes. In IEEE International Conference on Software Maintenance and Evolution (ICSME) (pp. 35-46). IEEE. 2017.]]
+    CLOSED: [2019-12-08 Sun 20:07]
 Very large dataset.
 > Our work [2,3] showed that semantic changes (fine-grained source code changes [4,5]), 
 > such as method removed, field added, are statistically significant in the context of software code maintenance
-see to diferrent vision of code evolution:
+differrent vision of code evolution:
 - how to make evolution append
-- what kind of evolution appened
+- what kind of change appened
 
 Big data approach with spark.
 
 - Corrective :: fix faults
 - Perfective :: improve sys and design
 - Adaptive :: introduce new features
-*** TODO read [[https://link.springer.com/article/10.1007/s10664-010-9143-7][Zaidman, A., Van Rompaey, B., van Deursen, A., & Demeyer, S. Studying the co-evolution of production and test code in open source and industrial developer test processes through repository mining. Empirical Software Engineering Journal, 16(3), 325-364. 2011.]]
-
-*** HALF read [[http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.149.2832&rep=rep1&type=pdf][Mining software repositories to study co-evolution of production & test code, A Zaidman, B Van Rompaey, S Demeyer… - … on software testing …, 2008 - ieeexplore.ieee.org]]
+*** CANCELLED read [[https://link.springer.com/article/10.1007/s10664-010-9143-7][Zaidman, A., Van Rompaey, B., van Deursen, A., & Demeyer, S. Studying the co-evolution of production and test code in open source and industrial developer test processes through repository mining. Empirical Software Engineering Journal, 16(3), 325-364. 2011.]]
+    CLOSED: [2019-12-08 Sun 20:06]
 Don't see the point of those RQ, very prospective.
 Extract data from commits
 Try to classify the kind of action applied to code for a given commit.
 ** [2019-10-19 Sat]
 *** STARTED How to detect, in an acceptable delay, tests impacted by changes in the code?
-
+Index test by functions it called during previous run.
+Here in JS functions are enough because it's the main way of branching between complexe chunck of code.
+Using parameters of functions (maybe global variables values can be put in a similar data structure (not that asynchrony is a form of function call)) it is possible to more precise on the impact of some changes (a function can take different path depending on the context (parameters)). 
+Use some metric and an order to get more relevant test first.
+Make a diff to get functions directily modified.
+Get test through the index with modified functions.
+Caution with memory shared with workers (multithreading).
 *** STARTED How to automatically evolve, is possible, tests based on code base changes?
-
-*** HALF look at semantic by github
+Generate new tests consiting of a sequence of calls synthetised from in field execution traces that are not in unit tests execution traces.
+Evolution based on types are difficult on loosely typed languages.
+Move function to another file, move tests to relevent place (some kind of metric between functions and tests?)
+Rename function, easy in most cases (almost work with standard tools in js)
+Delete function, find tests only testing this function, if it test something else try to apply the same method as function moving.
+Function member, think about how =this= is handled.
+Execute tests impacted by change then:
+Find subseq of traces that are not executed anymore
+*** DEFERRED look at semantic by github
+    CLOSED: [2019-12-09 Mon 12:25]
 Not very precise on calls.
 Does not work well with JSX thus not well with many gutenberg packages.
 Linking chained calls to their definition seam to be a pathological case for symbolic/static analysis.
 It is easily solved by logging the last element of the stack trace when logging a call to a function from the function definition.
 Getting this information can be conditional, only add the instrumentation when missing information.
 Overall it is much more brittle than the standard typescript compiler
+** [2019-11-14 Thu]
+*** Meeting with Djamel and Arnaud
+Make a prototype out of the idea of general co-evolution using dynamic analysis.
+Read paper more in depth.
+Find other papers.
+** [2019-11-17 Sun]
+*** DEFERRED try to harvest nested and sequent calls
+    CLOSED: [2019-11-17 Sun 16:16]
+Use a counter of finished function,
+that is incremented when an instrumented function is finished
+and is reset to 0 when a call to an instrumented function is made,
+add a new column to the call table or a new kind of entry.
+Very low cost.
+0 for a given call mean that its inside the previous function called
+what about async features.
+easier to put something in the frame? to match entrances and exits
+** [2019-11-27 Wed]
+*** STARTED read pdf of JSFlow
+**** Good sentencing to set limits
+A high-performance monitor would ideally be integrated in
+an existing JavaScript runtime, but they are fast moving
+targets and focused on advanced performance optimizations.
+For this reason we have instead chosen to implement our
+prototype in JavaScript. We believe that our JavaScript
+implementation finds a sweetspot between implementation
+effort and usability for research purposes. Thus, performance
+optimization is a non-goal in the scope of the current work
+**** future
+***** hybrid analysis
+One promising approach is to use a hybrid analysis, where
+a static information flow analysis is used to approximate the
+locations in need of upgrade before entering a secret context.
+**** related works
+***** hybrid analysis
+Chugh et al. [6] present a hybrid approach to handling
+dynamic execution. Their work is staged where a dynamic
+residual is statically computed in the first stage, and checked
+at runtime in the second stage.
+*** WAITING read [[file:../papers/more/mirshokraie-icst13.pdf][pdf]] [[http://blogs.ubc.ca/karthik/files/2013/01/mirshokraie-icst13.pdf][Mirshokraie, Shabnam, Ali Mesbah, and Karthik Pattabiraman. "Efficient JavaScript mutation testing." 2013 IEEE Sixth International Conference on Software Testing, Verification and Validation. IEEE, 2013.]]
+*** NEXT read [[file:../papers/more/Survey_DA_TestGen_js.pdf][pdf]] [[http://cs.staff.au.dk/~amoeller/papers/jssurvey/journal.pdf][Andreasen, Esben, et al. "A survey of dynamic analysis and test generation for JavaScript." ACM Computing Surveys (CSUR) 50.5 (2017): 66.]]
+Amazing to explain challenges of sloppy languages
+*** WAITING read [[file:../papers/more/Gyimesi-ICST-2019.pdf][pdf]] [[https://www.researchgate.net/profile/Andrea_Stocco2/publication/333681142_BUGSJS_A_Benchmark_of_JavaScript_Bugs/links/5cff58fda6fdccd13091d886/BUGSJS-A-Benchmark-of-JavaScript-Bugs.pdf][Gyimesi, Péter, et al. "Bugsjs: A benchmark of javascript bugs." 2019 12th IEEE Conference on Software Testing, Validation and Verification (ICST). IEEE, 2019.]]
+*** WAITING read [[file:../papers/more/pldi275-richards.pdf][pdf]] [[https://plg.uwaterloo.ca/~dynjs/pldi275-richards.pdf][Richards, Gregor, et al. "An analysis of the dynamic behavior of JavaScript programs." ACM Sigplan Notices. Vol. 45. No. 6. ACM, 2010.]]
+*** TODO think about using vector clock on traces
+- need to identify nodes in traces (the host app should have that)
+- need to piggy bag or do independanly transmit vector clock through between nodes
+*** TODO prototype the idea of multilanguage coevolution using dynamic analysis (DA) (during tests or usage)
+Here the dynamic analysis comes on top of static analysis (SA), 
+mainly to improve knowledge about symbols in the source code.
+That is in the case of a call to a function getting the position of its declaration.
+But it can also get things on access to variables or fields using for example Proxies (here I think about javascript, might be tricky on non-interpreted programs).
+This idea come from the fact that in the general case symbolic analysis on source code is difficult,
+semantic from github try to achieve that but is not very accurate.
+But there exist many static analyzer capable of linking symbols but they are language spécific (typescript SA from microsoft work pretty well but might be slow)
+In the context of co-evolution, shortening the loop between code update, test run and test fix
+might prove to be beneficial to the analysis of source code almost independant of programming languages.
+Simetrically improving knowledge on source code will allow to design better tests and dettect the impact of given changes.
+Obviously the limitations of testing (non exhaustive) and dynamic analysis (runtime overhead) apply to this method.
+But it is incremental, easy to implemente (juste instrument some code like declarations (see m1 internship))
+
+#+BEGIN_SRC js
+let x = true
+function f() { if(x) g()}
+function g() {}
+// TEST 1
+f()
+g()
+// TEST 2
+x = false
+f()
+g()
+#+END_SRC
+#+BEGIN_EXAMPLE
+// TEST 1
+f
+ g
+g
+// TEST 2
+f
+g
+#+END_EXAMPLE
+#+BEGIN_EXAMPLE
+// TEST 1
+:5:1 :2:0
+:2:14 :3:0
+:6:1 :3:0
+// TEST 2
+:9:1 :2:0
+:10:1 :3:0
+#+END_EXAMPLE
+**** Questions
+What can I get at runtime out of a stack trace?
+- given single thread asynchrony (events)
+- multi treading
+Is trace + link + SA enough to differentiate a nested call from a sequential call?
+Is trace in / out of decl better?
+- need to use try/finally, what overhead?
+**** Uses
+Using diffs and branches (calls, conditions) get lines of codes impacted by changes.
+- Synthetize new tests from taces, with behavioral models for example. Even prefill function parameters
+- Remove dead code, it would be more of an indication because this is no exostive method.
+- Sort tests by comparing behavior models of tests and usage. Thus executing tests that have an actual use.
+- Prioritarly execute tests impacted by recent changes.
+- Provide goto declarations from symbols, and revertly.
+- Statistics for given symbols (function usage (in tests, in field))
+*** TODO evaluate if following assumption can hold: changes handled by co-evolution are mostly sintactic not functional nor semantic
 * Emacs Settings                                                   :noexport:
 #    (ox-extras-activate '(ignore-headlines))
 Local Variables:
