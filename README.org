@@ -1,17 +1,22 @@
-#+TITLE: Etude sur la co-evolution logiciel
+#+TITLE:State of the art in code and test co-evolution
 # #+SUBTITLE: Internship at KTH from May 13, 2019 to July 15, 2019
-#+AUTHOR: Quentin Le Dilavrec\inst{1}
-#+LaTeX_CLASS: llncs
-# #+LaTeX_CLASS_OPTIONS: [runningheads]
-#+OPTIONS: title:t toc:nil
-#+LANGUAGE: french
+#+AUTHOR: Quentin \textsc{Le\ Dilavrec}
+#+LaTeX_CLASS: sdm
+#+LaTeX_CLASS_OPTIONS: [11pt]
+#+OPTIONS: title:nil toc:nil
+#+LANGUAGE: american
 #+EMAIL:     (concat "quentin.le-dilavrec" at-sign "ens-rennes.fr")
 #+SEQ_TODO: APPT(a) TODO(t) NEXT(n) STARTED(s) WAITING(w) HALF(h) APPT(a) | DONE(d) CANCELLED(c) DEFERRED(f)
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="org.css"/>
+#+LATEX_HEADER: \usepackage{graphicx}
+#+LATEX_HEADER: \usepackage{fullpage}
+
+# numeroter les pages
+#+LATEX_HEADER: \pagestyle{plain}
+
 #+LATEX_HEADER: \usepackage{titletoc}
 #+LATEX_HEADER: \usepackage[utf8]{inputenc}
 #+LATEX_HEADER: \usepackage[T1]{fontenc}
-#+LATEX_HEADER: \usepackage{graphicx}
 #+LATEX_HEADER: \usepackage{relsize}
 #+LATEX_HEADER: \usepackage{tikz}
 # #+LATEX_HEADER: \renewcommand\UrlFont{\color{blue}\rmfamily}
@@ -22,77 +27,308 @@
 # #+LATEX_HEADER: \usepackage[a-1b]{pdfx}
 # #+LATEX_HEADER: \usepackage{hyperref}
 #+LATEX_HEADER: \usepackage[normalem]{ulem}
-#+LATEX_HEADER: \tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt        
+# #+LATEX_HEADER: \tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt        
 # #+LATEX_HEADER: \institute{\inst{1} Affil1 \and \inst{2} Affil2 \and \inst{3} Affil3}
  # \inst{2} \and Author3 \inst{3}}
 #+MACRO: color @@latex:{\color{$1}@@$2@@latex:}@@
+
+#+LATEX_HEADER: \input{./featuretree.tex}
+
 # #+LATEX_HEADER: \def\email#1{\texttt{#1}}
-#+LATEX_HEADER: \institute{ Univ. Rennes \email{Quentin.Le-dilavrec@ens-rennes.fr} \and KTH \email{baudry@kth.se}}
+# #+LATEX_HEADER: \institute{ Univ. Rennes \email{Quentin.Le-dilavrec@ens-rennes.fr} \and KTH \email{baudry@kth.se}}
 
 #+LATEX_HEADER: \usepackage{subfig}
+# #+LATEX_HEADER: \pagestyle{plain}
 
 # #+LATEX_HEADER: \usepackage{showframe}
+# #+LATEX_HEADER: \title{My title}
+# #+LATEX_HEADER: \author{First\_Name \textsc{Name}}
+#+LATEX_HEADER: \supervisorOne{Djamel \textsc{Eddine\ Khelladi}}
+#+LATEX_HEADER: \supervisorTwo{Olivier \textsc{Barais}}
+#+LATEX_HEADER: \team{DiverSE}
+# %One of:
+# % ens-Rennes  esir    insa-rennes   rennes1  
+# % enssat    logoUbs   tsupelec
+# %here rennes1 for example
+#+LATEX_HEADER: \school{ens-Rennes}
+
+# % the domain should be one or two of:
+# % Technology for Human Learning 
+# % Artificial Intelligence 
+# % Computer Arithmetic
+# % Hardware Architecture
+# % Automatic Control Engineering
+# % Bioinformatics 
+# % Biotechnology
+# % Computational Complexity 
+# % Computational Engineering, Finance, and Science
+# % Computational Geometry 
+# % Computation and Language 
+# % Cryptography and Security 
+# % Computer Vision and Pattern Recognition
+# % Computers and Society 
+# % Databases 
+# % Distributed, Parallel, and Cluster Computing 
+# % Digital Libraries
+# % Discrete Mathematics 
+# % Data Structures and Algorithms 
+# % Embedded Systems 
+# % Emerging Technologies 
+# % Formal Languages and Automata Theory 
+# % General Literature 
+# % Graphics 
+# % Computer Science and Game Theory 
+# % Human-Computer Interaction 
+# % Computer Aided Engineering 
+# % Medical Imaging 
+# % Information Retrieval 
+# % Information Theory 
+# % Ubiquitous Computing 
+# % Machine Learning
+# % Logic in Computer Science 
+# % Multiagent Systems 
+# % Mobile Computing
+# % Multimedia
+# % Modeling and Simulation 
+# % Mathematical Software 
+# % Numerical Analysis 
+# % Neural and Evolutionary Computing 
+# % Networking and Internet Architecture 
+# % Operating Systems 
+# % Performance 
+# % Programming Languages 
+# % Robotics 
+# % Operations Research
+# % Symbolic Computation 
+# % Sound
+# % Software Engineering 
+# % Social and Information Networks 
+# % Systems and Control 
+# % Image Processing 
+# % Signal and Image Processing 
+# % Document and Text Processing
+# % Web
+#+LATEX_HEADER: \domain{Domain: Software Engineering - Computer Aided Engineering}
+
+# %write your abstract here
+#+LATEX_HEADER: \abstract{In this study we will try to establish the state of the art in co-evolution of code and tests.}
 
 
-# #+Begin_export latex
-# \author{Author1 \and Author2}
-# \maketitle
-# #+END_EXPORT
 
-#+BEGIN_abstract
-Dans cette étude nous allons tenté d'établir l'état de l'art de la co-évolution.
-#+END_abstract
+
+#+Begin_export latex
+%\author{Author1 \and Author2}
+\maketitle
+#+END_EXPORT
+
+# #+CAPTION: This is the caption for the next figure link (or table)
+# #+name: diag
+# [[./esir.png]]
+
+# #+BEGIN_abstract
+# In this study we will try to establish the state of the art in co-evolution of code and tests.
+# #+END_abstract
+
 * Introduction
-* Motivations
-Automatiser le développement logiciel.
-Réduire les erreurs humaines.
-* Test logiciel
-Détécter et corriger des erreurs dans une implementation.
-Spécifier des fonctionnalités
-Pas exhaustif comparé à de l'analyse symbolique, mais plus facile à mettre en oeuvre.
-Faciliter la spécification de fonctionalités complexes tout en laissant une certaine flexibilité dans l'implementation de cette dernière.
-* Co-evolution (change propagation)
+- Context
+  dev logiciel.
+
+  test.
+
+  evolution of projects.
+
+  automatisation.
+
+- problematic
+systems become more complex.
+- Motivations
+  Automate software development.
+
+  Reduce human errors.
+
+- Plan des sections
+Example -> background -> method -> results
+* Illustrating example
+A piece of code and a changes which is detected.
+And a test that is repaired/created/deleted/striped.
+* Background
+** Test logiciel
+Oracles
+Test/Specify functionalities
+Detect and repair bugs in implementation.
+Not as exhaustive compared to symbolic analysis, but easier to implement.
+Facilitate the specification of complex functionalities while allowing flexibility in the implementation of the latter.
+
+Quantify software quality cite:wang17_behav_execut_compar cite:Jin_2012
+
+cite:leotta2013capture
+cite:gyimesi2019bugsjs
+
+** Co-evolution (change propagation)
 Faciliter et automatiser l'évolution d'une spécification
 par réaction à une modification d'un model ou de code.
 Deux familles de co-evolutions:
 - co-évolution de models et de contraintes (UML et OCL)
+cite:hebig2016approaches
 - co-évolution de code et de tests
-| type     | changement  | impact on compile/test/validity | évolution                                   | typescipt     | Eclipse JAVA | spoon | semantic |
-|----------+-------------+---------------------------------+---------------------------------------------+---------------+--------------+-------+----------|
-| atomique | addition    | x/x/v                           | génération                                  | x/x           |              |       |          |
-|          | suppréssion | v/x/x                           |                                             | detect/repair |              |       |          |
-| composé  | déplacement | v/x/v                           | déplacement ou mise à jour de l'importation | v/x           |              |       |          |
-|          | renomage    |                                 | déplacement ou mise à jour de l'importation | v/x           |              |       |          |
-** classification des changements
-*** niveau d'abstraction
-- dossier
-  - fichier
-    - class/objet/fonction
-      - methode/class/objet/fonction
-        - paramètre
-        - branche
+
+cite:d2002co
+cite:zaidman2008mining then cite:zaidman2011studying
+* Methodology
+** how
+With a feature model.
+Identify major parameters/concepts.
+De/Corelate things.
+What are the cursor that can be move?
+What are the trade-offs?
+Finding correlations between objects of studies and solving methods.
+Then find papers tackling problems depending on situations.
+And finally find problems not/under tackled.
+Is there missing components to solve some problems are they computable?
+What are the intermediate representations of information in co-evolution?
+** plan/classification
+*** Feature model
+#+Begin_export latex
+\begin{figure}[htbp]
+\centering
+\scalebox{0.7}{
+%https://tex.stackexchange.com/a/335948
+\begin{forest}% addaswyd o gôd Salim Bou: https://tex.stackexchange.com/a/335782/
+  disjunction tree,
+  disjuncts from'=1,
+  concrete from'=1,
+  concrete colour=blue!85!cyan!40,
+  abstract colour=blue!85!cyan!15,
+  draw colour=darkgray,
+  [Change
+    [Abastaction, mandatory
+      [Class]
+      [Function]
+      [Branche]
+      [Instruction]
+    ]
+    [Granularity, mandatory
+      [Atomique]
+      [Composed]
+    ]
+    [Type, mandatory
+      [Corrective]
+      [Perfective]
+      [Adaptative]
+    ]
+  ]
+\end{forest}}
+\caption{\label{fig:featuretree}
+Feature model of co-evolution}
+\end{figure}
+#+END_EXPORT
+#+Begin_export latex
+\begin{figure}[htbp]
+\centering
+\scalebox{0.7}{
+%https://tex.stackexchange.com/a/335948
+\begin{forest}% addaswyd o gôd Salim Bou: https://tex.stackexchange.com/a/335782/
+  disjunction tree,
+  disjuncts from'=1,
+  concrete from'=1,
+  concrete colour=blue!85!cyan!40,
+  abstract colour=blue!85!cyan!15,
+  draw colour=darkgray,
+  [Evolution
+    [Type
+      [Repair, mandatory]
+      [Generate, mandatory]
+      [Remove, mandatory]
+    ]
+    [Degree of automation
+      [Manual---Semi---Auto]
+    ]
+  ]
+\end{forest}}
+\caption{\label{fig:featuretree}
+Feature model of co-evolution}
+\end{figure}
+#+END_EXPORT
+**** changes classification
+***** level of abstraction
+****** dossier/file/\(\{\)class,objet,fonction\(\}\)
+      - method/class/objet/fonction
+        - parameter
+        - branch
           - instruction
-*** granularité
-(from Khelladi)
+***** granularity
+(from cite:khelladi2018hal)
 - changement atomique
   - addition
   - suppréssion
 - changement composé
   - déplacement
   - renomage
-*** type de changement
-(from [levin])
-- Corrective :: fix faults
-- Perfective :: improve sys and design
-- Adaptive :: introduce new features
-** classification des évolutions
-*** réparation
-modifie un test pour passer la compilation, le runtime
-*** génération
-crée de nouveaux tests à partir des anciens par diverse methodes d'éxploration (génétique, regression, etc )
-*** supression
-enlève ou simplifie des testes/du code
-* Analyse static
+***** type de changement
+(from cite:levin2017co)
+- Corrective :: fix faults, corr to repair
+- Perfective :: improve sys and design, not corr
+- Adaptive :: introduce new features, corr to generation
+**** evolutions classification
+***** réparation
+     modifie un test pour passer la compilation, le runtime
+***** génération
+     crée de nouveaux tests à partir des anciens par diverse methodes d'éxploration (génétique, regression, etc )
+***** supression
+     enlève ou simplifie des testes/du code
+
+**** Paradigms
+    separation of concerns => OO, procedural
+
+    behavior/description =
+**** Full automation <--> Semi automation
+No automation is no tools.
+
+Semi automation might be detection of problems then gives possibles resolutions for the user to choose.
+
+Full automation is detecting and repairing papers
+**** Correlation Language/Analysis | More typed <--> Less typed | Model <--> Code
+ClassDiag/Ocaml/Java(strongly typed) ~ mainly Static analysis
+
+assembly/python/javascript/R(weekly typed) ~ mainly Dynamic analysis
+**** Type of test
+* Results
+| type     | changement  | impact on compile/test/validity | évolution                                   | typescipt     | Eclipse JAVA | spoon | semantic |
+|----------+-------------+---------------------------------+---------------------------------------------+---------------+--------------+-------+----------|
+| atomique | addition    | x/x/v                           | génération cite:andreasen2017survey         | x/x           |              |       |          |
+|          | suppréssion | v/x/x                           |                                             | detect/repair |              |       |          |
+| composé  | déplacement | v/x/v                           | déplacement ou mise à jour de l'importation | v/x           |              |       |          |
+|          | renomage    |                                 | déplacement ou mise à jour de l'importation | v/x           |              |       |          |
+
+** Abstraction level/Paradigm
+*** Test
+sys unit mock integration
+cite:alex2019bridging
+*** Implementation
+more functional
+*** Specification
+more declarative
+** Degree of automation
+trade-off between flexibility and ease of analysis, ex. type annotations.
+** Detection
+*** type of change
+cite:gyimesi2019bugsjs
+cite:khelladi2018hal
+cite:khelladi2017semi
+** Evolution
+Manual.
+Semi automated because lack of information, this info can be given by developer or mine through further analysis.
+Automated repair/generation, either with proven evolution or high quality heuristic with one solution.
+
+cite:mirzaaghaei2014automatic
+
+test generation cite:andreasen2017survey cite:alex2019bridging.
+fine grained cite:levin2017co.
+** Analysis method
+Impact of change.
+Data for amplifying test.
+cite:hindle2012naturalness
+*** Static analysis
 Nécéssite des informations de type (annoté ou inféré).
 Peut verifier des propiété sur des domaines infini de manière exaustives.
 Efficasse sur des programmes simples mais pouvant accépté un grand nombre d'entrées.
@@ -102,20 +338,31 @@ In program analysis we always have a type Top and a type Bottom, making type ana
 spoon
 typescript
 semantic
-* Analyse dynamic
-Particulièrement adapté au langages fortement dynamiques et peu typé.
-Ne peut pas fournir de garanties absolue sur un domaine infini.
-Au plus proche de l'utilisation réelle du programme.
-Efficasse sur des programmes potentiellements complexes mais acceptant peut d'entrées.
-JSFlow
-* Analyse hybride
+*** Dynamic analysis
+Particularly suitable for highly dynamic and not very typified languages.
+Cannot provide absolute guarantees on an infinite domain.
+As close as possible to the actual use of the program.
+Effective on potentially complex programs but accepting few inputs.
+
+JSFlow cite:hedin2014jsflow.
+cite:richards2010analysis.
+cite:andreasen2017survey.
+cite:jiang2006multiresolution.
+cite:beschastnikh2013unifying.
+*** Hybrid analysis
 Dans beaucoup de future work d'articles du domaine, et dans quelques contribution mineures.
 Supporte l'analyse statique en apportant des informations facilements accessibles au runtime.
 Supporte l'analyse dynamique en l'orientant vers les points sensibles détécter au cours de l'analyse statique.
 Se servir des tests pour récolter de l'information au runtime et améliorer des déduction de l'analyse statique.
 Se servir de l'analyse statique pour détecter des morceau de programmes sensibles et ansi les tester et les instrumenter pour mieux les comprendre et détecter les bugs.
-* Test par muttations
+cite:andreasen2017survey
+**** Mutation testing
 Changer la syntaxe d'un programme tout en tentant concever la même semantique de façon à tester des cas particuliers et rendre le code plus robuste. 
+cite:mirshokraie2013efficient
+* Conclusion
+** Future work
+Incremental evolution, with solution that are narrowed trough analysis while always proposing solutions as hints.
+cite:cabot2018wordpress
 # * References                                                         :ignore:
 bibliographystyle:plain
 bibliography:references.bib
@@ -303,6 +550,9 @@ Amazing to explain challenges of sloppy languages
 *** TODO think about using vector clock on traces
 - need to identify nodes in traces (the host app should have that)
 - need to piggy bag or do independanly transmit vector clock through between nodes
+Partial orders of event can represent any program in parallel/event systems.
+Can simplify the behavior of a program in event based systems,
+the sequential representation of event with an automata is vastly more complicated than each equvalent automata.
 *** TODO prototype the idea of multilanguage coevolution using dynamic analysis (DA) (during tests or usage)
 Here the dynamic analysis comes on top of static analysis (SA), 
 mainly to improve knowledge about symbols in the source code.
@@ -363,6 +613,17 @@ Using diffs and branches (calls, conditions) get lines of codes impacted by chan
 - Provide goto declarations from symbols, and revertly.
 - Statistics for given symbols (function usage (in tests, in field))
 *** TODO evaluate if following assumption can hold: changes handled by co-evolution are mostly sintactic not functional nor semantic
+** [2019-12-11 Wed]
+*** Meeting with Djamel and Arnaud
+- title chosen
+- plan at the section level
+- 
+*** TODO make feature model and result sub sections
+*** TODO send email to Djamel on Eric Fabre's course i.e. MAD
+*** TODO get new paper from Djamel through email 
+- coverage survey
+- his survey on models' co-evolution
+- survey on types of tests
 * Emacs Settings                                                   :noexport:
 #    (ox-extras-activate '(ignore-headlines))
 Local Variables:
@@ -375,5 +636,6 @@ eval:    (setq org-image-actual-width '(600))
 eval:    (unless (boundp 'org-latex-classes) (setq org-latex-classes nil))
 eval:    (setq org-latex-with-hyperref nil)
 eval:    (add-to-list 'org-latex-classes '("llncs" "\\documentclass{llncs}\n \[NO-DEFAULT-PACKAGES]\n \[EXTRA]\n"  ("\\section{%s}" . "\\section*{%s}") ("\\subsection{%s}" . "\\subsection*{%s}")                       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")                       ("\\paragraph{%s}" . "\\paragraph*{%s}")                       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+eval:    (add-to-list 'org-latex-classes '("sdm" "\\documentclass{sdm}\n \[NO-DEFAULT-PACKAGES]\n \[EXTRA]\n"  ("\\section{%s}" . "\\section*{%s}") ("\\subsection{%s}" . "\\subsection*{%s}")                       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")                       ("\\paragraph{%s}" . "\\paragraph*{%s}")                       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 eval:    (setq org-latex-pdf-process (list "latexmk -bibtex -shell-escape -f -pdf %F"))
 End:
