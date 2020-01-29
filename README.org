@@ -10,10 +10,21 @@
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="org.css"/>
 #+LATEX_HEADER: \usepackage{graphicx}
 #+LATEX_HEADER: \usepackage{fullpage}
-
+# #+LATEX_HEADER: \usepackage{wrapfig}
+#+LATEX_HEADER: \usepackage{longtable}
+#+LATEX_HEADER: \usepackage{makecell}
+#+LATEX_HEADER: \usepackage{afterpage} %break page later
+#+LATEX_HEADER: \usepackage{textcomp}
+#+LATEX_HEADER: \usepackage{amssymb} %circulaarrow
+#+LATEX_HEADER: \usepackage{dblfnote}
+#+LATEX_HEADER: \DFNalwaysdouble
+#+LATEX_HEADER: \usepackage{hyperref}
+ 
 # numeroter les pages
 #+LATEX_HEADER: \pagestyle{plain}
-
+#+LATEX_HEADER: \usepackage{caption}
+#+LATEX_HEADER: \usepackage{subcaption}
+#+LATEX_HEADER: \usepackage{lscape}
 #+LATEX_HEADER: \usepackage{titletoc}
 #+LATEX_HEADER: \usepackage[utf8]{inputenc}
 #+LATEX_HEADER: \usepackage[T1]{fontenc}
@@ -23,28 +34,29 @@
 #+LATEX_HEADER: \usepackage[american]{babel}
 #+LATEX_HEADER: \usepackage{minted}
 #+LATEX_HEADER: \usepackage{mdframed}
-#+LATEX_HEADER: \usepackage{color}
+# #+LATEX_HEADER: \usepackage{color}
+#+LATEX_HEADER: \input{./featuretree.tex}
+# #+LATEX_HEADER: \definecolor{lightgray}{gray}{0.9}
 # #+LATEX_HEADER: \usepackage[a-1b]{pdfx}
 # #+LATEX_HEADER: \usepackage{hyperref}
-#+LATEX_HEADER: \usepackage[normalem]{ulem}
+# #+LATEX_HEADER: \usepackage[normalem]{ulem}
 # #+LATEX_HEADER: \tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt        
 # #+LATEX_HEADER: \institute{\inst{1} Affil1 \and \inst{2} Affil2 \and \inst{3} Affil3}
  # \inst{2} \and Author3 \inst{3}}
 #+MACRO: color @@latex:{\color{$1}@@$2@@latex:}@@
 
-#+LATEX_HEADER: \input{./featuretree.tex}
 
 # #+LATEX_HEADER: \def\email#1{\texttt{#1}}
 # #+LATEX_HEADER: \institute{ Univ. Rennes \email{Quentin.Le-dilavrec@ens-rennes.fr} \and KTH \email{baudry@kth.se}}
 
-#+LATEX_HEADER: \usepackage{subfig}
 # #+LATEX_HEADER: \pagestyle{plain}
 
 # #+LATEX_HEADER: \usepackage{showframe}
 # #+LATEX_HEADER: \title{My title}
 # #+LATEX_HEADER: \author{First\_Name \textsc{Name}}
 #+LATEX_HEADER: \supervisorOne{Djamel \textsc{Eddine\ Khelladi}}
-#+LATEX_HEADER: \supervisorTwo{Olivier \textsc{Barais}}
+# TOD put arnaud instead
+#+LATEX_HEADER: \supervisorTwo{Arnaud \textsc{Blouin}}
 #+LATEX_HEADER: \team{DiverSE}
 # %One of:
 # % ens-Rennes  esir    insa-rennes   rennes1  
@@ -111,10 +123,22 @@
 #+LATEX_HEADER: \domain{Domain: Software Engineering - Computer Aided Engineering}
 
 # %write your abstract here
-#+LATEX_HEADER: \abstract{In this study we will try to establish the state of the art in co-evolution of code and tests.}
+#+LATEX_HEADER: \abstract{In this study, we will try to establish the state of the art in the co-evolution of code and tests.
+#+LATEX_HEADER: Software is everywhere, if not in a product it is used to produce or design it.
+#+LATEX_HEADER: Software is used in every field of research and industry.
+#+LATEX_HEADER: Due to the concept of separation of concerns,
+#+LATEX_HEADER: software systems are split into different types of artifacts.
+#+LATEX_HEADER: Such as tests, are able to detect bugs and help fixing them.
+#+LATEX_HEADER: But as the rest of the application evolves
+#+LATEX_HEADER: tests break. So to avoid rewriting the tests every time,
+#+LATEX_HEADER: we co-evolve tests.
+#+LATEX_HEADER: 
 
+#+LATEX_HEADER: }
+#+LATEX_HEADER: \newcommand{\etal}{et~\textit{al.}\@ }
 
-
+#+LATEX_HEADER: \usepackage{colortbl}%
+#+LATEX_HEADER: \setminted{breaklines} %linenos
 
 #+Begin_export latex
 %\author{Author1 \and Author2}
@@ -130,246 +154,1642 @@
 # #+END_abstract
 
 * Introduction
-- Context
-  dev logiciel.
+** Context                                                           :ignore:
+#   dev logiciel.
 
-  test.
+#   vert hori diag axis.
 
-  evolution of projects.
+#   test.
 
-  automatisation.
+#   evolution of projects.
 
-- problematic
-systems become more complex.
-- Motivations
-  Automate software development.
+#   automatisation.
 
-  Reduce human errors.
+# Software is everywhere, if not in a product it is used to produce or design it.
+# Software is used in every field of research and industry.
+# J Software
+Due to the concept of separation of concerns,
+which is able to reduce complexity, improve reusability, and make evolution simpler cite:hursch1995separation,ossher2001using,tarr1999n,
+software systems are split into different types of artifacts, 
+each targeting particular domain concerns.
+Ensuring the quality of those artifacts is thus of the utmost importance.
+# Software come in many shapes.
+# more like axis or tetrahedron than types?
+To gain a clear overview we can distinguish various types of software artifacts.
+# J Ok here
+Most commonly found in software projects are
+code, application programming interface (API), tests, models, scripts, etc.
+# There is no clear boundary between each one. 
+For example, the class model and the API can be completely integrated into the functional implementation.
+Moreover, an artifact can also be partially or completely synthesized or generated from others.
+As an example, it is possible to extract an API from some code or models,
+it is also possible to generate tests from models or functional implementations.
+As artifacts share common concepts,
+when one artifact evolves, other artifacts may be impacted and may need to be co-evolved.
+In this report, we will focus on the scenario of when code evolves and tests must be co-evolved.
+For example, moving a method from one class to another makes calls to this method invalid,
+but most importantly with the right contextual information,
+it is possible to fix those calls and to co-evolve tests by
+moving related tests to the proper place while fixing some other contextual differences.
+# -J good place but should do general then examples
+# -J It is possible to extract an API from some code or models.
+# -J It is possible to generate tests from models.
+# -J Those artifacts are overlapping and depend on one another to work properly.
+# -J It is possible to partially synthesize or generate one artifact from an other.
+# J this is the result of separation of concerns
+# -J2 In our current context assessing the quality of tests can be a major concern.
 
-- Plan des sections
-Example -> background -> method -> results
-* Illustrating example
-A piece of code and a changes which is detected.
-And a test that is repaired/created/deleted/striped.
+However, unfortunately, tests co-evolution remains mainly a manual task for developers, 
+which is tedious, error prone, and time consuming.
+In particular, when hundreds of developers collaborate together,
+and where those who maintain tests (testers) are not necessarily those who evolve the code [fn:0].
+
+# Along with assessing the design of models, wile reasoning about systems as a whole.
+    # behavior/description =
+# - problematic
+
+# Software artifacts evolves continuously, especially with today philosophy
+# "Release early, release often" adopted by /GAFAM/.
+# Due to the separation of concerns, 
+# those artifacts share and work on some common aspects.
+# But systems also become more feature rich [I think I have some a ref from a paper on that].
+# While the saying "Today release early release often" have became an industry standard [??]
+# Software artifacts work on common concepts so by changing some artifacts
+# other artifacts might be impacted, thus might be co-evolved. 
+# # Finally, changing the content of one might affect another.
+# # As software artifacts evolve, co-evolutions must be done repeatedly.
+# # And over time, lapses between releases got shorter
+# # and rolling release seam to become the norm in consumer devices.
+# # more there
+# # It thus became a challenge to co-evolve each kinds of software artifacts together.
+
+# dyn/static
+# To do so, there are two major ways,
+# the former focuses on proving programs through static analysis,
+# the latter tests the programs through dynamic analysis.
+# Each of them has advantages and drawbacks.
+
+** Objective                                                          :ignore:
+\\
+# J in the internship we will address ...
+In the internship we will address the problem of 
+co-evolving tests using information available in the rest of the code and its evolution.
+# In the internship we will address code/tests co-evolution,
+# J While in this article we will address the challenge of 
+While in this article we will establish
+a state of the art on the co-evolution of code and test.
+# and in this report, we will focus on the study of the literature
+# about code/tests co-evolution.
+# # To keep human errors in check the co-evolution should be automated as much as possible while keeping design choices in the developers hands. 
+** related works                                                    :ignore:
+Other survey have targeted
+the co-evolution meta-models and models cite:hebig2016approaches,
+the co-evolution of mutant and tests cite:jia2010analysis,
+and also the generation of tests cite:anand2013orchestrated,andreasen2017survey,
+but to the best knowledge they were no survey or state of the art on the co-evolution of code and test.  
+This article fills this gap, in preparation of this internship.
+** Plan des sections                                                 :ignore:
+\\
+# In this state of the art an illustrating example will be presented in the section [[Illustrating Example]].
+# Then in section [[Background]], a short background will be laid down.
+# To continue on section [[Methodology]] with the methodology used to construct this state of the art.
+# The results of the categorization will be concretely presented in section [[Classification of Approaches]].
+# Finally, in the conclusion, a rough plan of events and objectives for the internship will be discussed.
+The rest of the article is presented as follow:
+# Section [[Illustrating Example]] presents an illustrating example. 
+Section [[Background]] presents a short background.
+Section [[Methodology]] gives the methodology used to construct this state of the art.
+Section [[Classification of Approaches]] illustrates the results of the categorization presented in the methodology. 
+Finally section [[Conclusion]] presents the conclusion and initial research perspectives.
+
+[fn:0] https://github.com/microsoft/onnxruntime.
 * Background
-** Test logiciel
-Oracles
-Test/Specify functionalities
-Detect and repair bugs in implementation.
-Not as exhaustive compared to symbolic analysis, but easier to implement.
-Facilitate the specification of complex functionalities while allowing flexibility in the implementation of the latter.
+This first section presents a background on
+testing and co-evolution. 
+Listing [[lst:example]] shows a basic example of code and tests.
+** Illustrating example                                              :ignore:
+#  Through this state of the art the example in listing [[lst:example]] will be used as the red thread that hold use onto reality :blink:.
+#  This illustrating example shows a piece of code and a changes along with tests test that might need to be repaired/created/deleted/striped.
+# ** Illustrating Example
 
-Quantify software quality cite:wang17_behav_execut_compar cite:Jin_2012
+#  # cite:mirzaaghaei2014automatic examples
 
-cite:leotta2013capture
-cite:gyimesi2019bugsjs
+ #+latex: \begin{listing}[htbp]
+ #+latex: \centering
+ #+latex: \begin{minipage}[t]{0.45\linewidth}
+ # #+header:  :wrap "src js :results output"
+ # #+CAPTION: example.ts, v.1.0
+ #+header:  :results output
+ #+ATTR_LaTeX: :options xleftmargin=0pt
+ #+BEGIN_SRC typescript
+ export class Counter {
+   constructor(
+     private x : number) {}
+   count(cb?:(n:number)=>number){
+     if (cb){
+       this.x=cb(this.x);
+     }else{ 
+       return this.x++;
+     }
+   }
+ }
+ #+END_SRC
 
-** Co-evolution (change propagation)
-Faciliter et automatiser l'évolution d'une spécification
-par réaction à une modification d'un model ou de code.
-Deux familles de co-evolutions:
-- co-évolution de models et de contraintes (UML et OCL)
+ #+latex: \end{minipage}
+ # #+latex: \hfill
+ #+latex: \begin{minipage}[t]{0.45\linewidth}
+ # #+CAPTION: example.ts, v.1.1
+ #+ATTR_LaTeX: :options linenos, xleftmargin=10pt, numbersep=14pt
+ #+BEGIN_SRC typescript
+ test('trivial 1', () => {
+   const init = 0;
+   const e = new Counter(init);
+   expect(e.count()).toBe(init+1);
+ });
+
+ test('trivial 2', () => {
+   const e = new Counter(3);
+   expect(e.count(x=>x-2)).toBe(1);
+ });
+ #+END_SRC
+
+ #+latex: \end{minipage}
+ # #+latex: \end{center}
+ #+latex: \caption{example.ts (left) / example.test.ts (right)}
+ <<lst:example>>
+ #+latex: \end{listing}
+** Software Testing
+# J Aim of tests
+# J Example using illustrating example
+# J here put content from section 5.1.4 Target
+Tests allow us to detect bugs to solve them cite:gyimesi2019bugsjs.
+It is also a way to specify functionalities and constraints.
+# Detect and repair bugs in implementation.
+It is not as exhaustive compared to symbolic analysis, 
+but it is often easier to implement.
+Compared to declarative specifications,
+it facilitates the specification of complex functionalities
+while allowing flexibility in the implementation,
+by sticking to common concepts of imperative programming.
+
+Quantifying software quality is also a major concern,
+which is addressed by software testing,
+e.g., mutation testing cite:wang2017behavioral,
+or by comparing tests and field behaviors cite:leotta2013capture,jin2012bugredux
+
+Software testing can take many forms.
+Each form focuses on particular aspects of software and serve different goals.
+a) *Unit Tests* are the most known kind of tests, they can detect bugs early in development, 
+they run fast, automatically and help at finding causes of bugs.
+In Listing [[lst:example]] on the right, we can see some unit tests targeting the piece of code on the left.
+Like its name indicate the /class/ on the left is a counter, 
+its constructor instantiate the =x= attribute, 
+while its method =count= take a function as an optional parameter, 
+this function modify the =x= attribute by a certain number otherwise =x= is incremented by one.
+Both unit tests on the right test the =count= method,
+the first one initialize the counter at 0 then check the result of =count= called with the default parameter,  
+the second one initialize the counter at 3 then check the result of =count= called with a given lambda function.  
+b) *System tests* allow to asses the validity of a program in particular use cases, 
+but contrary to unit tests they are slow and might need human intervention in addition to not helping much at finding causes of bugs.
+Compared to unit tests in Listing [[lst:example]] system tests would be much larger and span over many classes at once.
+
+
+# \color{red}
+# Jdamel: explain example around here
+# \color{black}
+
+Multiple uses of tests also exists depending on some additional concerns, 
+such as mock testing, regression testing, performance testing, etc.
+For example,
+a) *mock testing* allows to abstract from dependencies and focuses on small and very controlled parts of programs,
+while 
+b) *regression testing* allows to compare different versions of a program to facilitates incremental improvements.
+
+** Co-evolution in generality
+# J separation of consern
+# J one evolve other cause other to evolve
+# J definition
+# J polyglot
+# J examples
+With a rough look at most software engineering systems,
+there are at least a few types of artifacts that are easy to discern like
+an API, a functional implementation of this API, 
+a model ---or specification--- of the application 
+and tests to check the implementation against some constraints.
+But there are many more software artifacts like traces, binaries, metadata, comments, etc.
+As a matter of fact, there is no clear boundary between each artifact.
+For example, the class model and the API can be completely integrated into the functional implementation.
+An artifact can also be partially or completely synthesized or generated from others.
+As an example, it is possible to extract an API from some code or models,
+it is also possible to generate tests from models or functional implementations.
+Moreover in the same way those artifacts are overlapping, 
+depend on each other to work properly
+and changing one might impact another negatively and hence requires co-evolution.
+
+- Definition 1: :: 
+  Co-evolution is the process of modifying a given impacted artifact $A$, 
+  in response to evolution changes of another artifact $B$.
+
+The co-evolution scenario we will focus on is code evolution and tests co-evolution.
+The co-evolution of tests can be split in *amplification* and *repair*.
+The amplification of tests can be seen as the continuation of tests generation
+in the context of co-evolution as it consider preexisting tests in relation
+to evolution in the code.
+One of the difficulties of amplification is the readability of generated tests.
+Whereas repairing tests with co-evolution using code,
+considers changes to the code as a way of detecting and fixing tests broken by code changes.
+Here the major challenges is to keep tests correct.
+# J amplification sentence , chrono from generation to amplification
+# Here both use artifacts on one another as data and try to optimize some metrics,
+# the amplification create new pieces
+# while the repair modify existing ones.
+# Obviously it is very close to the job of a developer.
+# Moreover one of the most important factors in the viability of a co-evolution technique is its degree of automation.
+# Consequently, one of the major point in co-evolution is making use of the information available
+# to automate changes that would have otherwise been tediously written by developers.
+
+Looking at Listing [[lst:example]] if we rename the method =count= of the class =Counter= as =update=,
+calls to the member =count= of instances of =Counter= would also need to be renamed.
+Similarly, if we make the parameter of method =count= mandatory,
+we would need to generate a default value for empty calls to method =count=.
+And as a last one, if we move the method =count= to another class,
+tests of =count= should be moved to a more appropriate place 
+and the constructors pointing to =Counter= would need to be renamed.
+# J3 use listing 1 to explain evolution an co-evolution
+*** More?                                                            :ignore:noexport:
+Facilitate and automate the evolution of a specification
+by reaction to a change in model or code.
+Two families of co-evolutions:
+- co-evolution of models and constraints (UML and OCL)
 cite:hebig2016approaches
-- co-évolution de code et de tests
+- code and test co-evolution
 
-cite:d2002co
+cite:dhondt2002coevolution
 cite:zaidman2008mining then cite:zaidman2011studying
 * Methodology
-** how
-With a feature model.
-Identify major parameters/concepts.
-De/Corelate things.
-What are the cursor that can be move?
-What are the trade-offs?
-Finding correlations between objects of studies and solving methods.
-Then find papers tackling problems depending on situations.
-And finally find problems not/under tackled.
-Is there missing components to solve some problems are they computable?
-What are the intermediate representations of information in co-evolution?
-** plan/classification
-*** Feature model
+** how                                                               :ignore:
+This section presents our methodology.
+We propose criteria to categorize approaches that handles the co-evolution of tests.
+Thanks to those criteria we will be able to classify the literature 
+and to choose better suited techniques depending on particular concerns. 
+Figure [[fig:featuretree]] illustrates those criteria as a feature model.
+# , to help in choosing the solution best fit to particular constraints
+# Using a feature model we will try to identify major parameters and concepts of the co-evolution of code and test.
+# We will try to find correlations between features,
+# but also highlight the parameters that are adjusted or adjustable,thus showing the trade-off they provoke.
+Another major focus will be to expose relations between objects of studies and solving methods.
+# Then find papers tackling problems depending on situations.
+# And finally find problems not/under tackled.
+In the end, it will allow us to find still existing gaps in test co-evolution 
+and to identify research questions and future works perspectives.
+
+# and maybe some common intermediate representations of information about the co-evolution of tests.
+
+This state of the art took inspiration from the survey cite:hebig2016approaches from Hebig et /al./ on the co-evolution of models.
+# But it was adapted as I only had a fourth of the space and roughly one millionth of the time :blink:.
+The bibliographical research started with a set of articles given by my supervisors.
+Then alternating between searches on mainly /google scholar/ with keywords from previous papers
+in addition to following the most relevant references from papers ("snowballing" technic) that I read.
+# I was able to find ?? papers in addition to the ?? initial papers and ?? given later.
+# - inspiré survey sys djamel
+# - got paper for  encandrants
+# - search with key words on google scholar
+# - follow links
+
+** Feature model                                                     :ignore:
+#+latex:\begin{figure}[t]\centering\small%
 #+Begin_export latex
-\begin{figure}[htbp]
-\centering
-\scalebox{0.7}{
-%https://tex.stackexchange.com/a/335948
+%\begin{landscape}
+%\end{landscape}
+%\begin{wrapfigure}{r}{0.4\textwidth}
+%\resizebox{\textwidth}{!}{%
 \begin{forest}% addaswyd o gôd Salim Bou: https://tex.stackexchange.com/a/335782/
   disjunction tree,
-  disjuncts from'=1,
-  concrete from'=1,
+  disjuncts from'=0,
+  concrete from'=0,
   concrete colour=blue!85!cyan!40,
   abstract colour=blue!85!cyan!15,
   draw colour=darkgray,
-  [Change
-    [Abastaction, mandatory
-      [Class]
-      [Function]
-      [Branche]
-      [Instruction]
+  [Co-evolution, calign=center, s sep=1.5cm, xshift=-3cm, tier=l1
+    [Degree of automation, or, mandatory, s sep=.5cm, xshift=-6.5cm
+      [Manual, xshift=-6.5cm]
+      [Semi, xshift=-6.5cm]
+      [Auto, xshift=-6.5cm]
     ]
-    [Granularity, mandatory
-      [Atomique]
-      [Composed]
+    [Implementation evolution, mandatory, s sep=1cm, l*=3, calign=last, xshift=-2cm
+      [Granularity, or, mandatory, l*=.9, calign=last, xshift=-.5cm
+        [Atomic]
+        [Composed]
+      ]
+      [Abstraction, or, mandatory, l*=1.6
+        [Class]
+        [Function]
+        [Branch]
+        [Instruction]
+      ]
+      [Detection, xor, mandatory, l*=.9, calign=first, xshift=.5cm
+        [Online]
+        [Offline]
+      ]
+     %% [Type
+     %%   [Corrective]
+     %%   [Perfective]
+     %%   [Adaptative]
+     %% ]
     ]
-    [Type, mandatory
-      [Corrective]
-      [Perfective]
-      [Adaptative]
+    [Tests co-evolution, mandatory, l*=5.8, calign=last, xshift=-2.2cm, s sep=1cm
+      [Impact analysis, mandatory, l*=1
+        [Mode,mandatory,xor, l*=1.2
+          [Online]
+          [Offline]
+        ]
+        [Analysis methods, or, mandatory, l*=1.9, xshift=-.5cm
+          [Static]
+          [Dynamic]
+          [Learning]
+          [...]
+        ]
+      ]
+      [Kind of test, or, mandatory, l*=1.2
+        [Unit test]
+        [System test]
+      ]
+      [Target, or, mandatory, l*=1.7
+        [Calls, l*=1.2]
+        [Inputs, l*=1.2]
+        [Oracles, l*=1.2]
+      ]
+      [Type, xor, mandatory, l*=1.2
+        [Repair]
+        [Amplify]
+      ]
+    ]
+    [Language characteristics, optional, or, s sep=.5cm, calign=last, xshift=-1.5cm % grow=east
+      [Typing System]
+      [Paradigm]
+      %% [Static, xshift=-1.5cm]
+      %% [Dynamic, l*=1.7, xshift=-.5cm]
+      %% [Imperatif, l*=1.7, xshift=-.5cm]
+      %% [Declaratif, xshift=.5cm]
     ]
   ]
-\end{forest}}
-\caption{\label{fig:featuretree}
-Feature model of co-evolution}
-\end{figure}
+\end{forest}%%\end{wrapfigure}
+\caption{Feature model of co-evolution of code and test
+[\mytikzor{}:~or,
+\mytikzxor{}:~xor,
+\mytikzmandatory{}:~mandatory,
+\mytikzoptional{}:~optional]}
 #+END_EXPORT
+<<fig:featuretree>>
+#+latex:\end{figure}
+*** save                                                           :noexport: 
 #+Begin_export latex
-\begin{figure}[htbp]
-\centering
-\scalebox{0.7}{
-%https://tex.stackexchange.com/a/335948
+%\begin{landscape}
+%\end{landscape}
+%\begin{wrapfigure}{r}{0.4\textwidth}
+%\resizebox{\textwidth}{!}{%
 \begin{forest}% addaswyd o gôd Salim Bou: https://tex.stackexchange.com/a/335782/
   disjunction tree,
-  disjuncts from'=1,
-  concrete from'=1,
+  disjuncts from'=0,
+  concrete from'=0,
   concrete colour=blue!85!cyan!40,
   abstract colour=blue!85!cyan!15,
   draw colour=darkgray,
-  [Evolution
-    [Type
-      [Repair, mandatory]
-      [Generate, mandatory]
-      [Remove, mandatory]
+  [Co-evolution, calign=center, s sep=2cm, tier=l1
+    [Paradigm, optional, or % grow=east
+      [Static, xshift=-1cm]
+      [Dynamic, l*=1.5]
+      [Imperatif, l*=1.5]
+      [Declaratif, xshift=1cm]
     ]
-    [Degree of automation
-      [Manual---Semi---Auto]
+    [Implementation's evolution, optional, l*=3.5, ignore edge, calign=first, xshift=3cm
+      [Granularity, or, mandatory, l*=.9, calign=last, xshift=-.5cm
+        [Atomic]
+        [Composed]
+      ]
+      [Abstraction, or, mandatory, l*=1.6
+        [Class]
+        [Function]
+        [Branch]
+        [Instruction]
+      ]
+      [Detection of change, xor, mandatory, l*=.9, calign=first, xshift=.5cm
+        [Online]
+        [Offline]
+      ]
+     %% [Type
+     %%   [Corrective]
+     %%   [Perfective]
+     %%   [Adaptative]
+     %% ]
+    ]
+    [Analysis methods, or, mandatory, l*=3.5, xshift=-.5cm
+      [Static]
+      [Dynamic]
+      [Learning]
+    ]
+    [Test's co-evolution, optional, l*=6.2, ignore edge, calign=last, xshift=-2.5cm
+      [Impact analysis, xor, optional
+         [Online]
+         [Offline]
+      ]
+      [Kind of test, or, optional
+        [Unit test]
+        [System test]
+      ]
+      [Target, or, optional
+        [Calls]
+        [Inputs]
+        [Oracles]
+      ]
+      [Type, xor, optional
+        [Repair]
+        [Amplify]
+      ]
+    ]
+    [Degree of automation, or, mandatory
+      [Manual]
+      [Semi]
+      [Auto]
     ]
   ]
-\end{forest}}
-\caption{\label{fig:featuretree}
-Feature model of co-evolution}
-\end{figure}
+\end{forest}%%\end{wrapfigure}
+\caption{Feature model of co-evolution of code and test
+[\mytikzor{}:~or,
+\mytikzxor{}:~xor,
+\mytikzmandatory{}:~mandatory,
+\mytikzoptional{}:~optional]}
 #+END_EXPORT
-**** changes classification
-***** level of abstraction
-****** dossier/file/\(\{\)class,objet,fonction\(\}\)
-      - method/class/objet/fonction
-        - parameter
-        - branch
-          - instruction
-***** granularity
-(from cite:khelladi2018hal)
-- changement atomique
-  - addition
-  - suppréssion
-- changement composé
-  - déplacement
-  - renomage
-***** type de changement
-(from cite:levin2017co)
-- Corrective :: fix faults, corr to repair
-- Perfective :: improve sys and design, not corr
-- Adaptive :: introduce new features, corr to generation
-**** evolutions classification
-***** réparation
-     modifie un test pour passer la compilation, le runtime
-***** génération
-     crée de nouveaux tests à partir des anciens par diverse methodes d'éxploration (génétique, regression, etc )
-***** supression
-     enlève ou simplifie des testes/du code
+# Understand what changed
+# - how
+# - language
+# - type of change
 
-**** Paradigms
-    separation of concerns => OO, procedural
+** Co-evolution                                                      :ignore:
+\\
+# J new sub section in classification criteria
+# J Classification criteria ...
+Here we would like to look at co-evolution as a 2 step process,
+where the first step would be to detect and categorize evolution in the implementation of some program,
+the second step would be the co-evolution of tests.
+We first present criteria that are common to both steps.
 
-    behavior/description =
-**** Full automation <--> Semi automation
-No automation is no tools.
+*** Degree of automation
+One of the first criterion to consider is the *degree of automation* of the co-evolution.
+It quantifies the amount of involvement needed by a developer in the process of co-evolution.
+In case of a full automation one might only have to confirm co-evolution,
+otherwise in a semi-automated co-evolution one might need to choose between possible resolutions to apply 
+or even create a custom transformation, capable of handling some domain-specific evolution.
+# J explain different values
+We consider /manual/, /semi-automated/ and /fully-automated/ approaches.
 
-Semi automation might be detection of problems then gives possibles resolutions for the user to choose.
+**** test :noexport:
 
-Full automation is detecting and repairing papers
-**** Correlation Language/Analysis | More typed <--> Less typed | Model <--> Code
-ClassDiag/Ocaml/Java(strongly typed) ~ mainly Static analysis
+dazdazd azdazdaz adazd zd az \mytikzdot{} fzf aefeafeafa afaefea.
 
-assembly/python/javascript/R(weekly typed) ~ mainly Dynamic analysis
-**** Type of test
-* Results
-| type     | changement  | impact on compile/test/validity | évolution                                   | typescipt     | Eclipse JAVA | spoon | semantic |
-|----------+-------------+---------------------------------+---------------------------------------------+---------------+--------------+-------+----------|
-| atomique | addition    | x/x/v                           | génération cite:andreasen2017survey         | x/x           |              |       |          |
-|          | suppréssion | v/x/x                           |                                             | detect/repair |              |       |          |
-| composé  | déplacement | v/x/v                           | déplacement ou mise à jour de l'importation | v/x           |              |       |          |
-|          | renomage    |                                 | déplacement ou mise à jour de l'importation | v/x           |              |       |          |
+#+BEGIN_EXPORT latex
+\begin{tikzpicture}
+\draw (0,0) -- (.3,0) -- (.3,.3) -- (0,.3) -- (0,0);
+\end{tikzpicture}
+#+END_EXPORT
 
-** Abstraction level/Paradigm
-*** Test
-sys unit mock integration
-cite:alex2019bridging
-*** Implementation
-more functional
-*** Specification
-more declarative
+*** Language characteristics
+The systems that can be co-evolved possess different characteristics.
+Those characteristics can particularly be observed through the language point of view.
+Most software projects use some framework and use a multitude of languages.
+This multitude of languages might possess common characteristics.
+We mainly consider the language paradigm like the /Object oriented/ (with the Class construct), /Imperative/ or /Declarative/ paradigms
+and the type system like /strongly/ or /weakly/ typed languages.
+# The *languages type system and paradigms* used to design a software project 
+# should have a great impact on the other co-evolution features.
+# In facts, some languages present syntactically and statically less information than other.
+# J not here v those 3 lines
+#  In the following paragraphs on the impact analysis and the level of abstraction,
+# we will see that the analyzed language can be a major criterion to choose
+# a type of analysis and a level of abstraction.
+# In the following classification only the paradigm helping in the analysis and co-evolution are shown.
+# J explain different values 
+
+# It should mainly impact the type of analysis and the level of abstraction.
+
+*** Detection and classification of evolutions
+ Detecting and classifying evolution is the first step in any co-evolution of code and test.
+ Each major criterion composing this step of co-evolution are explained in the following 3 paragraphs.
+**** Granularity
+The *granularity of evolution* is very important to the automation of the co-evolution.
+The simplest kind of evolution is an /atomic/ change, 
+while it is very simple to detect simple changes, it does not contain much information.
+Additions and deletions are the most simple atomic changes, and often the only atomic changes considered.
+It is possible to combine atomic changes into /composed/ changes.
+For example, moving a method from one class to another is composed of a deletion and addition.
+Another example of complex change is renaming a method, it is also composed of a deletion and addition,
+but here the change is much more localized.
+
+**** Level of abstraction
+In every software analysis, the *level of abstraction* reflect the trade-off
+made between precision and performance.
+For example, the /file/ abstraction can be considered as high abstraction to detect changes in a codebase,
+the file abstraction is what most compilers for procedural languages are using to avoid recompiling unchanged files.
+There is also the /class/ abstraction, it is one of the most used,
+as it syntactically and statically presents a large quantity of semantic information.
+In facts, methods are carrying the behaviors of object,
+and behaviors can be shared through inheritance.
+But this abstraction requires the analyzed language to be object oriented 
+and possibly have class, prototypes and an inheritance system.
+To establish measurements of impacts from changes it is necessary to look at calls,
+this abstraction is a /call graph/.
+Finally looking at the level of /flow graphs/, i.e.,
+blocks of instructions linked by branches might be necessary for some analysis 
+but it requires a lot of effort and processing power to compute.
+
+******* dossier/file/\(\{\)class,objet,fonction\(\}\)              :noexport:
+       - method/class/objet/fonction
+         - parameter
+         - branch
+           - instruct%ion%
+**** Detection 
+The *detection of changes* can be done 
+online by logging operations made on files
+or /offline/ by comparing states of files between versions.
+Detecting changes through /online/ logging is more precise
+but is also more intrusive than offline detection.
+Online detection can be brittle in case of unlogged changes.
+Thus all external tools modifying the code would need to provide the set of applied changes.
+
+***** (from cite:khelladi2018change)                               :noexport:
+ - changement atomique
+   - addition
+   - suppréssion
+ - changement composé
+   - déplacement
+   - renomage
+
+**** Type de changement (optional for the state of the art) :ignore:noexport:
+\\
+The type of change might no be very useful for coevolution,
+It was just used a distinction made in exploratory papers on statistical analysis of commits,
+correlation between comments of the commits and the type of change,
+but also between the moment of the commit in the schedule (release,...) and the type of change. 
++ (from cite:levin2017co)
+  - Corrective :: fix faults, corr to repair
+  - Perfective :: improve sys and design, not corr
+  - Adaptive :: introduce new features, corr to generation
+
+***** evolutions classification                             :ignore:noexport:
+\\
+ assembling atomic changes into complex changes
+ ! does not split the classification.
+*** Co-evolution of tests
+
+Here, we will look at the particular aspects that concern the actual
+the co-evolution of tests.
+# ction 
+# In addition to the language used to describe tests,
+# the kind of test can be a major criterion of how co-evolution should append.
+#  The type of test might also be an important factor on how the co-evolution should be done.
+# We could imagine some kind of tests that should not be co-evolved or with a reduced set of rules
+# to avoid instabilities on some major API. 
+**** Impact analysis                                              
+# \\
+The *impact analysis* of code changes on tests need to be quantified to propose relevant co-evolution.
+# TODO
+# J It allows to loca and test that nee
+It allows to locate tests that need to be co-evolved
+and to provide some more contextual information on tests dependencies
+
+Two modes of impact analysis can be discerned.
+/Offline/ impact analysis is computed when the developer is done with his current set of changes.
+While /online/ impact analysis is computed interactively whenever a change happens.
+
+# The most wide spread analysis is /static analysis/.
+# When type information are to scarce statically, it is useful to use /dynamic analysis/.
+
+# J Merge wih impact analysis
+# J and put this intro in the 
+# Impact of change.
+Many possible analysis methods are preceding to impact analysis
+depending of the language characteristics of the co-evolved artifacts.
+The main points of analyzing code here is to measure the impact of changes,
+and to extract useful information from programs.
+being capable of measuring code allow to find tests that need to be repaired or relaunched.
+# Data for amplifying test.
+Analyzing code can also be useful to harvest data and patterns cite:hindle2012naturalness 
+that will allow to better amplify tests.
+In addition to static analysis, using the history of changes 
+and the behavior of the program during test might prove to allow
+improvements to the precision and performance of programming assistants.
+
+In the general case, analyzing programs is difficult.
+The whole stack from an algorithms to run is complex and diverse.
+Indeed many programming languages use different paradigms.
+For each language many parsers and compilers exist.
+There is also many runtime and intermediate representations.
+It is thus important to find points in this stack where analysis are the most efficient.
+
+The static analysis is often the first choice when one want to analyze a particular program or project.
+In the best case scenario a static analysis can prove properties of a program for any given inputs. 
+Most domains of science and industry that needs to prove properties use language with rich types systems.
+But annotating programs can be tedious and lead to bugs.
+That is why analysis tools make heavy use of type inference to lighten the burden of type annotating.
+Yet type inference have its limits as uncertainties lower the quality of types through the program.
+Refining those uncertainties is a major point to improve software quality.
+
+# Reducing memory can dig out interesting info from programs while testing, some king of mutation testing
+
+Even if rich type systems are very useful for analysis,
+programs heavily constrained by types are less flexible, 
+demand more code and use more complex artifacts to alleviate types overhead.
+There is an obvious trade-off between development flexibility and ease of analysis.
+Making use of runtime can disambiguate uncertainties through programs
+and ensure properties with more precision.
+Combining both static and dynamic analysis offer the possibility to further improve code quality while improving flexibility. 
+
+- Static analysis ::
+ It requires type information (annotated or inferred).
+ It can check properties on infinite domains in an exhaustive way.
+ Prove to be efficient on simple programs but able to accept a large number of inputs.
+ Type systems can be languages that don't have explicit annotated types,
+ it is nonetheless possible to use type rules e.g. mono-type in C with everything is an int, can check for null dereferencing (that is dereferencing 0).
+ To improve robustness and flexibility most analysis tools have types that match all types and types that match no types.
+ In practice, it allows incremental typing and type inference.
+
+ Many tools exist to analyze programs statically, most of them only work on one language (typescript, compCert, spoon)
+ while some try to be more agnostic (llvm, semantic, pandoc).
+ Focusing on one language allow finer analysis but might not scale to multilanguage projects.
+ While tools handling multiple language might work better on multilanguage projects,
+ to leverage the quantity of work for each language such tools need an intermediate representations of programs.
+ 
+ Static analysis work with semantic models such as class diagram,type system, and so on.
+
+- Dynamic analysis ::
+ It is particularly suitable for highly dynamic and not very typified languages.
+ but it cannot provide absolute guarantees on an infinite domain.
+ Event is it tries to be as close as possible to the actual behavior of the program.
+ Dynamic analysis can be effective on potentially complex programs while accepting fewer inputs than static analysis.
+ 
+ Dynamic analysis woks with functional models such as finite state machines, memory behavior, and so on.
+- Hybrid analysis ::
+ # In many future work of articles in the field, and in some minor contributions.
+ Supports static analysis by providing information that is easily accessible to the runtime.
+ It also supports dynamic analysis by directing it to the sensitive points detected during static analysis.
+ Use tests to collect information at runtime and improve inferences from static analysis.
+ Use static analysis to detect pieces of sensitive programs and test and instrument them to better understand them and detect bugs.
+# - Mutation testing ::
+#   Injecting artificial errors in code to evaluate tests quality.
+#   These errors are called mutants.
+#   An equivalent mutant is a mutant syntactically different but semantically equivalent.
+#   When a test fin a non-equivalent mutant, it kill the mutant.
+#   The more mutants a test kills, the higher the quality of the test.
+#  # Changing the syntax of a program while trying to keep the same semantics in order to test particular cases and make the code more robust. 
+#  # Changer la syntaxe d'un programme tout en tentant concever la même semantique de façon à tester des cas particuliers et rendre le code plus robuste. 
+
+# Learning based methods also exist, they make use of previous changes of code and tests to
+# predict and recommend co-evolution on new changes.
+
+
+**** Kind of tests                                                   
+# \\
+The *kind of tests* targeted by a tests' co-evolution methods could be relevant as /system tests/
+are much bigger and take longer than /unit tests/.
+In a way the kind of tests handled by co-evolution methods should give a lead on the scalability of the approach.
+
+**** Target                                                          
+# \\
+The *target* of the co-evolution can be the /calls/, the /inputs/ of calls or the expression of /oracles/.
+# TODO make example real, cite:daniel2010test
+Take the example from the background, the value given to the class constructor is an input,
+while the value in the =toBe= method is part of an oracle.
+A value can also be used both as an input and as a part of an oracle, like the constant =init=.
+From another point of view an input value go through what we want to test,
+while an oracle value avoid passing though what we want to test.
+
+- Calls ::
+  Reproducing functional behaviors observed in production is one of the first requirement to synthesize units test from in field executions.
+  There are many proposed techniques in the literature capable of producing a skeleton of calls for test cases.
+  # ?? use trace and fsm to model functional behavior of an application, then generate new tests from the smallest non already tested sequences.
+- Inputs (caution inputs of test or inputs of calls) ::
+  From an existing test or a skeleton of calls,
+  there are many tools to produce complete tests (almost, in the case of the calls skeleton oracle should also be generated).
+  # Can be computed by symbolic execution cite:daniel2010test.
+- Oracles ::
+  They are assertions to compare input and output values of the tests to detect if those tests pass or fail.
+  Assertions are tricky to repair and generate as it part of the program specification.
+  So the challenge is to mine those from somewhere.
+
+For example, in the first test of Listing [[lst:example]],
+a /call/ to the constructor of =Counter= is made with the =number= 3 as an /input/,
+then a /call/ to the method =count= is made with a function as an /input/.
+Finally the /oracle/ checks that the value return by the previous call is equal to the number 1.
+
+  # ?? uses symbolic exec to.
+  # ?? check if system test also fail with same inputs to reduce false positives.
+***** aaa                                                          :noexport:
+
+**** Type
+# \\
+Given some evolutions two *types of co-evolution* are possible.
+***** amplification                                                  :ignore:
+/Amplification/ co-evolution creates new tests from other tests by various exploratory methods (genetics, regression, etc.).
+# J explain generatin and relation to amplification
+***** réparation                                                     :ignore:
+/Repair/ co-evolution modifies existing tests to make it pass the compilation, or the runtime checks.
+
+**** benefit class                                          :ignore:noexport:
+\\
+Finally *the benefit class* measure the possible impact of co-evolution rules.
+See survey cite:hebig2016approaches for supplementary details in the case of model co-evolution.
+
+**** Correlation Paradigm/Analysis | More typed <--> Less typed :ignore:noexport:
+\\
+We would also look at the correlation between type of analysis used in articles
+depending on the language paradigms,
+in particular the use of dynamic analysis to complement possible lack of static accessible data.
+# ClassDiag/Ocaml/Java(strongly typed) ~ mainly Static analysis
+
+# assembly/python/javascript/R(weekly typed) ~ mainly Dynamic analysis
+* Classification of Approaches
+*** classification intro                                             :ignore:
+In this section, we will present the state of the art on co-evolution of code and tests
+following the classification given by the feature model in Figure [[fig:featuretree]].
+We will present some of our results in Table [[classification1]] regarding
+the classification of approaches that detect and classify evolution in software artifacts, mostly code.
+Then in Table [[classification2]], regarding the actual co-evolution of software artifacts, mostly tests.
+It should be noted that approaches mentioned in one table but not in the other,
+either only detect evolution or only improve tests without considering evolution.
+\newpage
+# With tables [[classification1]] and [[classification2]] organizing the different presented papers. 
+*** old classification intro                                       :noexport:
+# begin landscape package lscape
+# begin sideways package sideways
+# rotating
+# #+Latex: \afterpage{\begin{landscape}
+# #+ATTR_LATEX: :environment longtable :align |c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|
+# | paper | type     | changement  | impact on compile/test/validity | évolution                                   | typescipt     | Eclipse JAVA | semantic | spoon |
+# |-------+----------+-------------+---------------------------------+---------------------------------------------+---------------+--------------+----------+-------|
+# |       | atomique | addition    | x/x/v                           | génération cite:andreasen2017survey         | x/x           |              |          |       |
+# |       |          | suppréssion | v/x/x                           |                                             | detect/repair |              |          |       |
+# |       | composé  | déplacement | v/x/v                           | déplacement ou mise à jour de l'importation | v/x           |              |          |       |
+# |       |          | renomage    |                                 | déplacement ou mise à jour de l'importation | v/x           |              |          |       |
+# #+Latex: \end{landscape}}
+** Intermediate table                                       :noexport:ignore:
+#+TBLNAME: default
+| parad | language | test | objectives | automation | granularity      | detection | target | type   | impact  |
+|-------+----------+------+------------+------------+------------------+-----------+--------+--------+---------|
+| C     | java     | unit | repair     | auto       | C$parad -> Class | offline   | inputs | repair | offline |
+
+# no in granularity :: no concept of code base change or evolution 
+# impact: which test is impacted
+# hist: use of history of changes
+# analysis: how program are analyzed
+# test: wich tests are co-evolved
+# granularity: of used changes
+# abstraction: done on programs to make analysis faster
+# detect: when changes are detected
+# target: parts of tests co-evolved
+# type: what is done, repairing test or create new tests
+# language: but also protocols and data structures
+
+# J3 / -> ? : unclear
+# J3 
+
+#+TBLNAME: interm
+| main                | year | artifacts relation                   | parad | objectives          | my                                        |   t1 | analysis          | abstraction              | ref                           |   t2 | kind          | language               | dyngranu   | granularity    | target                        | detection | type            | change | automation | impact      | test           | usable thg   | compare_eval                                | eval objects, resources                      | impact Sci           | num | reading issues |
+|---------------------+------+--------------------------------------+-------+---------------------+-------------------------------------------+------+-------------------+--------------------------+-------------------------------+------+---------------+------------------------+------------+----------------+-------------------------------+-----------+-----------------+--------+------------+-------------+----------------+--------------+---------------------------------------------+----------------------------------------------+----------------------+-----+----------------|
+| wang \etal          | 2017 | system test \rightarrow unit test    | E     | find best metric    | M1, compare 4 tools                       |      | dynamic           | instruction              | cite:wang2017behavioral       |    1 | survey        | java                   | 2 events   | /              | tests calls                   | /         | generate        | no     | /          | offline     | unit           | /            | coverage,mutation,temporal invariant        | JetUML,Log4j,Common {IO,Lang}                | more than mutation t |     |                |
+| jin \etal           | 2012 | production \rightarrow test          | E     | repro fail in house | M1, used LLVM                             |    5 | dynamic           | class, flow\nbsp{}graph  | cite:jin2012bugredux          |    2 | technical     | C                      | events     | composed       | tests calls and inputs        | offline   | generate        | no     | auto       | N/A[fn:5]   | unit           | tool(avail)  | time space overhead, eff{ctivi,icien}       | [16,23]->SIR[21],BugBench[22],exploit-db[23] | in house reprod      |     |                |
+| kampmann \etal      | 2019 | system test \rightarrow unit test    | D     | param unit test ??  | M1,Kim et al.[12]                         |      | dynamic           | flow graph               | cite:alex2019bridging         |    2 | technical     | web-python-sql-C stack | failure    | /              | whole tests                   | /         | generate        | no     | auto       | offline     | unit           | proto        | coverage,coverage over time,lifting         | GNU coreutils,sed,dc                         | accu of sys to unit  |     |                |
+| hindle \etal        | 2012 | code=language                        | C,I   | java is like eng.?  | M1,naturalness software                   |   -5 | static, nlp       | word                     | cite:hindle2012naturalness    |      | study         | java,C                 | /          | /              | /                             | /         | /               | no     | /          | /           | N/A            | /            | n-gram                                      | many languages                               | apply nlp to code    |     |                |
+| jiang \etal         | 2006 | runtime->model(fsm)                  | E,??I | abnorm trace detect | M1,secu                                   |   31 | dynamic           | event                    | cite:jiang2006multiresolution |   -1 | technical     | N/A                    | events     | composed       | tests event                   | offline   | /               | single | auto       | online      | N/A            | algo         | inject faults                               | J2EE Pet Store                               | prove point          |     |                |
+| beschastnikh \etal  | 2013 | spec+production->model(fsm)          | E     | fsm inference       | M1,logic                                  |   -3 | dynamic           | event                    | cite:beschastnikh2013unifying |   -3 | theo,study    | N/A                    | events     | offline        | tests event                   | /         | /               | no     | user spec  | /           | N/A            | ?? algo      | declarative vs procedural kTails            | logs from prev study[7]                      | decl ktail is better |     |                |
+| tonella \etal       | 2014 | test $\circlearrowleft$ model(fsm)   | E     | better fsm use      | M1, interpolate ngrams                    |   -5 | dynamic           | event                    | cite:tonella2014interpolated  |    1 | technical     | all                    | events     | composed       | tests event                   | offline   | generate        | no     | semi[fn:3] | offline     | all            | method,algo  | 4 custom metrics used + qualitative         | Adobe Flextore,Cyclos,... (java,js,php,...)  | prove title          |     |                |
+| hebig \etal         | 2016 |                                      |       | co-evo approach     | init                                      |      |                   |                          | cite:hebig2016approaches      |      | survey        |                        |            | many           |                               |           | / repair        |        |            |             |                |              |                                             |                                              |                      |  10 |                |
+| khelladi \etal      | 2018 | metamodel \rightarrow model          | C     | compose resol       | init                                      |    0 | static            | class                    | cite:khelladi2018change       |   -1 | technical     | UML class diag.        | no         | composed       | models                        | online    | repair          | yes    | semi[fn:4] | offline     | /              | tool         | correctness                                 | many models                                  |                      |   0 |                |
+| khelladi \etal      | 2017 | (meta)model/OCL $\circlearrowleft$   | C,D   | also co-evolve OCL  | init                                      |    5 | static            | class                    | cite:khelladi2017semi         |    1 | technical     | OCL                    | no         | composed       | whole models and constraints  | online    | repair          | yes    | semi[fn:4] | offline     | N/A[fn:2]      | tool         |                                             |                                              |                      |   1 |                |
+| zaidman \etal       | 2008 | production - test                    | N/A   | classify evolution  | init,redundant                            |      | static            | SVN, class               | cite:zaidman2008mining        |      | study         | N/A,(SVN)              |            |                |                               |           | /               |        |            |             | /              | explo tool   |                                             |                                              |                      |   6 |                |
+| zaidman \etal       | 2011 | production->test                     |       | classify evolution  | init                                      |      | static            | SVN, class               | cite:zaidman2011studying      |      | study         | (SVN)                  |            |                |                               |           | /               |        |            |             | all            |              |                                             |                                              |                      |     |                |
+| levin \etal         | 2017 | code - test                          | N/A   | classify evolution  | init,classif_change_t                     |   10 | static            | class, metadata   | cite:levin2017co              |   -5 | tech,study    | all,(git)              | no         | atomic         | whole tests                   | offline   | N/A             | yes    | auto       |             | /              |              |                                             |                                              |                      |   4 |                |
+| gall \etal          | 2009 | change \rightarrow ?                 | C     | analysis            | l'17co,good peda+fig                      |    1 | static            |                          | cite:gall2009change           |      | study,magaz   | java,...               |            | atomic         | N/A                           |           | /               | yes    | auto       |             |                |              |                                             |                                              |                      |     |                |
+| martinez \etal      | 2019 | code \rightarrow ?                   | I,OO  | detecting ??        | snd                                       |    1 | pattern, none     | class, metadata   | cite:martinez2019coming       |   -2 | analysis      | java,(git)             | no         | atomic         | whole tests                   | offline   | N/A             | yes    | manual     | offline     | /              |              |                                             |                                              |                      |     |                |
+| levin \etal         | 2017 | code \rightarrow      ?              |       | predicting          | l'17co,classif_change_t                   |    1 |                   | class, metadata   | cite:levin2017boosting        |   -5 | study         | java,(git)             | no         | atomic         | c:all                         | offline   | recommend       | yes    | semi[fn:3] |             |                |              |                                             |                                              |                      |     |                |
+| schafer \etal       | 2008 | instantiation \rightarrow  ?         |       | mining              | r'11sca                                   |    1 |                   |                          | cite:schafer2008mining        |      | study         |                        |            |                |                               |           | /               |        |            |             |                |              |                                             |                                              |                      |     |                |
+| andreasen \etal     | 2017 | runtime->test                        | Dy    | test gen js         | googleS                                   |      | dynamic           |                          | cite:andreasen2017survey      |    1 | survey        | js                     |            |                |                               |           | generate        |        |            |             | all            |              |                                             |                                              |                      |     |                |
+| zhu \etal           | 1997 |                                      |       | base unit test cov  | a'04ov,test cov, crit                     |      |                   |                          | cite:zhu1997software          |      | book          |                        |            |                |                               |           | ??gen           |        |            |             |                |              |                                             |                                              |                      |     |                |
+| mirshokraie \etal   | 2013 | code                                 | Dy    | mut, fast/eval test | googleS,mutation                          |   -5 | static,dynamic    | call graph               | cite:mirshokraie2013efficient |   -5 | technical     | js                     | mutation   | ?              | mut                           | offline   | mut gen         | no     | auto       | offline     | all            | tool         | non-equiv mutant,fault severity             | SimpleCart,JQuery,...                        |                      |     |                |
+| gyimesi \etal       | 2019 |                                      | Dy    | bench things        | googleS                                   |   -1 | /                 | /                        | cite:gyimesi2019bugsjs        |   -1 | benchmark     | js                     | /          | /              | /                             | /         | /               | /      | /          | /           | /              | bench        |                                             |                                              |                      |     |                |
+| anand \/etal        | 2013 |                                      | I,OO  | find new tests      | test gen                                  |      | random            |                          | cite:anand2013orchestrated    |    1 | survey        | java                   |            |                |                               |           | generate        |        |            |             |                |              |                                             |                                              |                      |     |                |
+| xu \etal            | 2010 | code \rightarrow test                | I     | augmentation        | r'11sca                                   |    3 | genetic, symbolic | branch                   | cite:xu2010directed           |    5 | study         | C                      | regression | /              | whole tests                   |           | augment         | yes    | auto       | offline     | unit           |              |                                             | from SIR                                     |                      |     |                |
+| marsavina \etal     | 2014 | production \rightarrow pattern->test | OO    | ana-mine-fix        | l'17co                                    |    5 | static            | all, branch\nbsp{}cover  | cite:marsavina2014studying    |    1 | study         | java                   |            | composed       | whole tests                   | offline   | generate        | yes    | N/A        | offline     |                |              |                                             | CommonsLang,CommonsMath,Gson,PMD,JFreeChart  |                      |   5 |                |
+| mirzaaghaei \etal   | 2014 | code \rightarrow test                | C,I   | repair,8 co-evo pat | init                                      |   10 | static            | class                    | cite:mirzaaghaei2014automatic |   10 | technical     | java                   | no         | atomic         | whole tests                   | offline   | repair, amplify | yes    | auto       | offline     | all            | algo,tool    | apply freq, repair effectiveness            | JodaTime,Barbecue,JfreChart,PDM,Xstream      | handle java patterns |   3 |                |
+| fraser \etal        | 2011 | cove->test                           | OO    | gen test suite      | googleS                                   |   -1 | ?                 | flow graph               | cite:fraser2011evosuite       |   -1 | technical     | java                   | events     | composed       | whole tests                   | offline   | amplify         | yes    | semi       | offline     | unit           | tool         |                                             |                                              |                      |     |                |
+| fraser \etal        | 2014 | code->test                           | C     | test java generics  | arcuri                                    |   -1 | static            |                          | cite:fraser2014automated      |    1 | technical     | java                   |            |                | tests calls and inputs        |           | generate        | no     | auto       | N/A[fn:5]   | unit           | evosuite     |                                             |                                              |                      |     |                |
+| daniel \etal        | 2010 | symbolicExec \rightarrow test        | I,OO  | repair              | r'11sca,symb,literal repair !!!           |    3 | static, symbolic  | instruction              | cite:daniel2010test           |    3 | technical     | java, .NET             | fail       | composed[fn:1] | whole tests                   | offline   | repair          | no     | semi[fn:3] | offline     | unit           |              |                                             |                                              |                      |     |                |
+| person              | 2009 | symbolicExec                         |       | symbolic exec       | r'11sca                                   |   -1 | static, symbolic  | instruction              | cite:person2009differential   |   -1 | phd dissert   |                        |            |                |                               |           | /               |        |            |             |                |              |                                             |                                              |                      |     |                |
+| hassan              | 2009 | code->fault                          | I     | predicting,entrop   | l'17co,OS,dbms,gui,regression             |   35 | static            | pattern, metadata       | cite:hassan2009predicting     |   -1 | tech,study    | C,C++                  | faults     | atomic         | /                             | offline   | /               | yes    | auto       | /           | N/A            | eq           |                                             |                                              | complex,faults,modif |     |                |
+| dagenais \etal      | 2011 | code->API                            | C     | recommending        | r'11sca                                   |   35 | static            | metadata                | cite:dagenais2011recommending |   -1 | technical     | java                   | /          | composed[fn:1] | calls in general              | offline   | call repair     | yes    | semi[fn:3] | cod offline | N/A            | impr SemDiff |                                             |                                              |                      |   7 |                |
+| dagenais \etal      | 2014 | code->doc                            | C     | recommending        | dagenais                                  |    5 | static            | pattern                  | cite:dagenais2014using        |    0 | technical     | java                   | /          | composed       | references from documentation | offline   | doc repair      | yes    | semi[fn:3] | doc offline | N/A            | pattern,tool |                                             |                                              |                      |     |                |
+| halfond \etal       | 2008 | call-<                               |       | param mismatch id   | r'11sca                                   |   34 | static            | calls, data\nbsp{}flow   | cite:halfond2008automated     |    1 | technical     | java, PHP, http,...    | /          | composed       | calls in general              | offline   | repair          | yes    | semi[fn:3] | offline     | ?              | proto WAIVE  |                                             | Daffodil                                     |                      |     |                |
+| vcubranic \etal     | 2003 | many->db for human use               | all   | learning curve      | kh'18ch,personized indexing,stats         |   35 | static            | metadata, ...     | cite:vcubranic2003hipikat     |   -1 | technical     | all                    | ?          | ?              | index                         | offline   | index           | ~yes   | auto       | offline     | N/A            | hipikat      |                                             |                                              |                      |     |                |
+| xing \etal          | 2006 | things in general                    | C     | refactoring how wha | r'11sca,Eclipse refactoring               |      | static, ??        | ??                       | cite:xing2006refactoring      |   -0 | study         | java                   | /          | ??             | ??                            | ??        | ?? /            | ??     | ??         | ??          | N/A            | ??           |                                             |                                              |                      |     |                |
+| levin \etal         | 2016 | things in general                    | C     | predict maintenance | l'17co,classif_change_t                   |   -1 | static            | metadata, class         | cite:levin2016using           |   -1 | study         | CVS,java               | ??         | atomic         | ??                            | offline   | ??/             | yes    | ??         | ??          | N/A            | ??           |                                             |                                              | catalog              |     |                |
+| memon \etal         | 2008 | runtime \rightarrow test             | E     | repair,augmentation | r'11sca,GUI,capture&replay,semiauto compo |   35 | dynamic           | event                    | cite:memon2008automatically   |    2 | technical     | all                    | EvtF graph | composed       | whole tests                   | online    | repair          | yes    | semi[fn:4] | offline     | unit[fn:6]     | tool         |                                             | CrosswordSage,FreeMind,GanttProject,JMSN     |                      |     |                |
+| thummalapenta \etal | 2009 | code \rightarrow test                | OO,?C | generation          | r'11sca                                   |    0 | static            | class, flow\nbsp{}graph  | cite:thummalapenta2009mseqgen |    2 | technical     | java                   | ?          | ?              | tests calls and parameters    | ?         | generate        | no     | semi[fn:3] | offline     | unit           |              |                                             |                                              |                      |     |                |
+| robinson \etal      | 2011 | ? ->test                             |       | generation          | r'11sca                                   |   -1 | static            |                          | cite:robinson2011scaling      |    2 | technical     | java                   |            | N/A            | whole tests                   | offline   | generate        |        | auto       | offline     | unit[fn:6]     | Randoop      |                                             |                                              |                      |     |                |
+| tsantalis \etal     | 2018 | code \rightarrow ?                   | I,OO  | detecting ?? ?? git | trd, pattern                              |   30 | static            | instruction, class       | cite:tsantalis2018accurate    |    0 | technical     | java                   | no         | composed[fn:1] | N/A                           | offline   | notify          | bit    | semi[fn:3] | offline     | N/A            | RMiner       |                                             |                                              |                      |     |                |
+| galeotti \etal      | 2013 | code -> test                         | C     | symb impr test gen  | arcuri                                    |   -1 | static, symbolic  |                          | cite:galeotti2013improving    |    2 | technical     | java                   | no         |                | tests calls and inputs        | ?         | generate        | ??no   | auto       | N/A[fn:5]   | unit           |              |                                             |                                              |                      |     |                |
+| arcuri \etal        | 2011 |                                      |       | debunk              | a'13or                                    |      |                   |                          | cite:arcuri2011adaptive       |      | study         |                        |            |                |                               |           | ??/             |        |            |             |                |              |                                             |                                              |                      |     |                |
+| arcuri \etal        | 2007 |                                      |       | co-evo              | a'13or, too seminal                       |   -1 | static            |                          | cite:arcuri2007coevolving     |   -1 | technical     |                        |            | ??not easy     |                               |           | ??all           |        |            |             |                |              |                                             |                                              |                      |     |                |
+| arcuri \etal        | 2008 |                                      |       | fix bugs            | a'13or,seminal,evolutionary testing       |   -1 |                   |                          | cite:arcuri2008automation     |   -1 | ?? technical  |                        |            | yes but        |                               |           | repair          | bit    |            |             |                |              |                                             |                                              |                      |     |                |
+| arcuri \etal        | 2008 |                                      |       | improvement         | a'13or                                    |   -1 |                   |                          | cite:arcuri2008multi          |   -1 | technical     |                        |            |                |                               |           | ??generate      |        |            |             |                |              |                                             |                                              |                      |     |                |
+| arcuri \etal        | 2008 |                                      |       | co-evolutionary     | a'13or,co-evolutionary                    |    1 |                   |                          | cite:arcuri2008novel          |   -1 | technical     | java,.NET              |            |                | all                           |           | repair          |        | auto??     |             |                | eval         |                                             |                                              |                      |     |                |
+| arcuri \etal        |      |                                      |       | implem code         | arcuri                                    | -0.5 | static            |                          | cite:arcuri2014co             | -0.5 | technical     | java                   |            |                |                               |           |                 |        |            |             |                |              |                                             |                                              |                      |     |                |
+| papadakis \etal     | 2019 |                                      |       | prove advances mut  | googleS,mut                               |      |                   |                          | cite:papadakis2019mutation    |    1 | survey        |                        |            |                |                               |           | /               |        |            |             |                |              |                                             |                                              |                      |     |                |
+| jia \etal           | 2010 |                                      |       | prove domain growth | tools,mut                                 |      |                   |                          | cite:jia2010analysis          |    1 | survey        | java,C, C++,...        |            |                |                               |           | /               |        |            |             |                |              |                                             |                                              |                      |     |                |
+| adamapoulos \etal   | 2004 | mutant <-> test                      | I     | meta-mut tests      | a'13or,meta-mutation testing              |   31 | static, genetic   | mutant                   | cite:adamopoulos2004overcome  |    1 | technical     | Fortan-77              | N/A        | N/A            | tests inputs                  | offline   | generate        | algo   | auto       | offline     | unit           | formula      |                                             | simu of a mut testing tool like Mothra,1993  | rise of mut with GAs |     |                |
+| zhang \etal         | 2011 |                                      |       | generation          | a'13or,gen,evol,symbolic                  |    1 |                   |                          | cite:zhang2011automatic       |   -1 | technical     | SQL                    | /          | N/A            | tests inputs                  | offline   | generate        | no     | semi       |             | load test      |              |                                             |                                              |                      |     |                |
+| nistor \etal        | 2015 |                                      |       | code                | a'13or                                    |      |                   |                          | cite:nistor2015caramel        |      |               |                        |            |                |                               |           | fix code        |        |            |             |                |              |                                             |                                              |                      |     |                |
+| pinto \etal         | 2012 | test  ?                              | OO,C  | debunk              | l'17co                                    |   +0 | static            |                          | cite:pinto2012understanding   |   +0 | study         | java                   |            |                |                               |           | ??/             | yes    |            |             | all            | TestEvol     |                                             |                                              |                      |   9 |                |
+| beller \etal        | 2015 | code \rightarrow code                |       | when,how,why        | l'17co                                    |   -5 |                   |                          | cite:beller2015how            |   -5 | study (socio) |                        |            |                |                               |           |                 |        |            |             |                |              |                                             |                                              |                      |     |                |
+| richards \etal      | 2010 |                                      | Dy    | how dyn js work     | googleS                                   |   -2 |                   |                          | cite:richards2010analysis     |   -1 | analysis      | js                     |            |                |                               |           | /               |        |            |             |                |              |                                             |                                              |                      |     |                |
+| freeman \etal       | 2002 |                                      |       |                     | snd                                       |   -5 |                   |                          | cite:freeman2002software      |   -5 | magazine      |                        |            |                |                               |           |                 |        |            |             |                |              |                                             |                                              |                      |     |                |
+| hedin \etal         | 2014 |                                      | Dy    |                     | googleS,interpreter                       |   -5 | dynamic           |                          | cite:hedin2014jsflow          |   -5 | technical     | js                     |            |                |                               |           |                 |        |            |             |                |              |                                             |                                              |                      |     |                |
+| dhondt \etal        | 2002 | code$\circlearrowleft$               | C,D   | try LMP             | init,try to reread                        |   -5 | static            |                          | cite:dhondt2002coevolution    |   -1 | technical     | java, ??smalltalk      |            |                |                               |           |                 |        |            |             | /              |              |                                             |                                              |                      |   2 | short,complexe |
+| leotta \etal        | 2013 | test                                 | Dy,E  |                     | googleS,on the side                       |   -5 |                   |                          | cite:leotta2013capture        |   -5 | study         | js                     |            |                |                               |           |                 |        |            |             | C&R,prog.mable |              | Capture-Replay vs. Programmable Web Testing |                                              |                      |   8 |                |
+| mirshokraie \etal   | 2015 |                                      |       |                     | mir                                       |      | dynamic           | mut                      | cite:mirshokraie2015jseft     |    2 | technical     | js                     | event      | N/A            | whole tests                   | offline   | generate        | ?no    | auto       | offline     | unit           |              |                                             |                                              |                      |     |                |
+| mirshokraie \etal   | 2016 |                                      |       |                     | mir                                       |      | dynamic           | mut                      | cite:mirshokraie2016atrina    |    2 | technical     | js                     | event      | N/A            | whole tests                   | offline   | generate        | ?no    | auto       | offline     | unit           |              |                                             |                                              |                      |     |                |
+
+** Table 1                                                           :ignore:
+*** header                                                         :noexport:
+
+#+Tblname: header0coev
+| Paper | Paradigm | Analysis method | degree of automation |
+
+#+Tblname: header3tools
+| Name | Application | Year | Character (General,...)(Opensource,Commercial) | Available | Ref |
+
+#+Tblname: header1
+| main      | year | ref | language | granularity | abstraction | detection | automation | analysis |
+|-----------+------+-----+----------+-------------+-------------+-----------+------------+----------|
+| Reference |      |     | Language | Granularity | Abstraction | Detection | Automation |  Analysis |
+
+**** aa 
+#+begin_src python :hlines yes :colnames no :results output :var val=2 :var data=interm head=header1
+import pandas as pd
+import re
+h = head[0]
+df = pd.DataFrame(data[2:],columns=data[0])
+df = df[h].reindex(h, axis=1)
+prog = re.compile(r"^(?:(.*?) )?cite:([^\s]*)(.*)$") # cite:(.*) (.*)")
+def format_cite(x):
+    r = prog.match(str(x))
+    if r is None:
+        return x
+    elif r.group(1) is None:
+        print(1,r.group(2))
+        #return 'cite:'+ r.group(1)
+    else:
+        print(2,r.group(1))
+        #return r.group(1) + 'cite:'+ r.group(2)
+df = df.applymap(format_cite)
+#print([h]+[None]+list(map(list,df.values)))
+#+end_src
+
+*** content                                                          :ignore:
+#+NAME: classification1
+#+begin_src python :exports results :hlines yes :colnames no :var val=2 :var data=interm :var head=header1
+import pandas as pd
+import numpy as np
+import re
+h = head[0]+['t1','kind']
+H = head[2]
+df = pd.DataFrame(data[2:],columns=data[0])
+df = df[h].reindex(h, axis=1)
+prog = re.compile(r"^(?:(.*?) )?cite:([^\s]*)(.*)$") # cite:(.*) (.*)")
+def format_cite(x):
+    r = prog.match(str(x))
+    if r is None:
+        return x
+    else:
+        tmp = '\cite{'+ r.group(2) + '}'
+        if r.group(1) is not None:
+            tmp = r.group(1) + tmp
+        if r.group(3) is not None:
+            tmp = tmp + r.group(3)
+        return tmp
+df['t1']=df['t1'].apply(lambda x: int(x) if x!='' else 0)
+mask = (df['t1']+df['kind'].apply(lambda x: -100 if 'survey' in x else -20 if 'study' in x else 0))>1
+df = df[mask]
+del df['t1']
+del df['kind']
+
+
+df['year'] = df['year'].apply(int)
+df = df.sort_values(by ='year')
+df['main'] = df['main'].apply(lambda x: str(x).capitalize() )
+#df['main'] = df['main'].apply(lambda x: str(x).capitalize() )+' '+df['year'].apply(str)
+#del df['year']
+#df.rename(columns={"main": "paper"})
+
+#H = H[0:1] + [''] + H[3:]
+
+
+df = df.applymap(format_cite)
+def format_row(x, i):
+    tmp = list(map(str,x))
+    for j in range(len(tmp)):
+        if "\\\\" in tmp[j]:
+            tmp[j] = '\\makecell{' + tmp[j] + '}'
+    if i%2==0:
+        tmp[0] = '\rowcolor{gray!25} '+ tmp[0]
+    return tmp
+
+r = [None]+[H]+[None]+list([format_row(x,i) for i,x in enumerate(df.values)])+[None]
+return(r)
+#+end_src
+
+#+latex:\begin{center}\scriptsize
+#+TBLNAME: classification1
+#+CAPTION: Classification part 1, implementation's evolution [?:\nbsp{}not mentioned, N/A:\nbsp{}not\nbsp{}attributable]
+#+ATTR_LATEX: :environment longtable :align m{2.3cm}m{0.39cm}m{0.35cm}||m{1.5cm}|l|m{2cm}|l|m{1.4cm}|m{1.2cm}
+#+RESULTS: classification1
+|--------------------------------------+------+---------------------------------+---------------------+----------------+--------------------------+-----------+------------+--------------------|
+| Reference                            |      |                                 | Language            | Granularity    | Abstraction              | Detection | Automation | Analysis           |
+|--------------------------------------+------+---------------------------------+---------------------+----------------+--------------------------+-----------+------------+--------------------|
+| \rowcolor{gray!25} Vcubranic \etal   | 2003 | \cite{vcubranic2003hipikat}     | all                 | ?              | meta\nbsp{}data, ...     | offline   | auto       | static             |
+| Adamapoulos \etal                    | 2004 | \cite{adamopoulos2004overcome}  | Fortan-77           | N/A            | mutant                   | offline   | auto       | genetic            |
+| \rowcolor{gray!25} Jiang \etal       | 2006 | \cite{jiang2006multiresolution} | N/A                 | ?              | event                    | prod      | auto       | dynamic            |
+| Halfond \etal                        | 2008 | \cite{halfond2008automated}     | java, PHP, http,... | composed       | calls, data\nbsp{}flow   | offline   | semi[fn:3] | static             |
+| \rowcolor{gray!25} Memon \etal       | 2008 | \cite{memon2008automatically}   | all                 | composed       | event                    | online    | semi[fn:4] | dynamic            |
+| Hassan                               | 2009 | \cite{hassan2009predicting}     | C,C++               | statistical    | pattern, meta\nbsp{}data | offline   | auto       | static |
+| \rowcolor{gray!25} Daniel \etal      | 2010 | \cite{daniel2010test}           | java, .NET          | composed[fn:1] | instruction              | offline   | semi[fn:3] | symbolic           |
+| Fraser \etal                         | 2011 | \cite{fraser2011evosuite}       | java                | composed       | flow graph               | offline   | semi       | dynamic            |
+| \rowcolor{gray!25} Dagenais \etal    | 2011 | \cite{dagenais2011recommending} | java                | composed[fn:1] | metadata                | offline   | semi[fn:3] | static             |
+| Jin \etal                            | 2012 | \cite{jin2012bugredux}          | C                   | composed       | class, flow\nbsp{}graph  | offline   | auto       | dynamic            |
+| \rowcolor{gray!25} Mirzaaghaei \etal | 2014 | \cite{mirzaaghaei2014automatic} | java                | atomic         | class                    | offline   | auto       | static             |
+| Dagenais \etal                       | 2014 | \cite{dagenais2014using}        | java                | composed       | pattern                  | offline   | semi[fn:3] | static             |
+| \rowcolor{gray!25} Khelladi \etal    | 2017 | \cite{khelladi2017semi}         | OCL                 | composed       | class                    | online    | semi[fn:4] | static             |
+| Khelladi \etal                       | 2018 | \cite{khelladi2018change}       | UML like            | composed       | class                    | online    | semi[fn:4] | static             |
+| \rowcolor{gray!25} Tsantalis \etal   | 2018 | \cite{tsantalis2018accurate}    | java                | composed[fn:1] | instruction, class       | offline   | semi[fn:3] | static    |
+|--------------------------------------+------+---------------------------------+---------------------+----------------+--------------------------+-----------+------------+--------------------|
+
+#+latex:\end{center}
+[fn:1] Only consider in place compositions.
+[fn:2] Co-evolve OCL constraints.
+[fn:3] Makes recommendations, on possible co-evolutions.
+[fn:4] Might sometimes require human design choices.
+[fn:5] Do not use changes to generate tests.
+[fn:6] In the context of regression testing.
+** Table 2                                                          :ignore:
+*** header                                                         :noexport:
+#+TBLNAME: header2
+| main      | year | ref | language | impact          | test         | type | target | automation | analysis |
+|-----------+------+-----+----------+-----------------+--------------+------+--------+------------+----------|
+| Reference |      |     | Language | Impact Analysis | Kind of test | Type | Target | Auto-mation | Analysis |
+
+*** content                                                          :ignore:
+#+NAME: classification2
+#+begin_src python :exports results :hlines yes :colnames no :var val=2 :var data=interm :var head=header2
+import pandas as pd
+import numpy as np
+import re
+h = head[0]+['t2','kind']
+H = head[2]
+df = pd.DataFrame(data[2:],columns=data[0])
+df = df[h].reindex(h, axis=1)
+prog = re.compile(r"^(?:(.*?) )?cite:([^\s]*)(.*)$") # cite:(.*) (.*)")
+def format_cite(x):
+    r = prog.match(str(x))
+    if r is None:
+        return x
+    else:
+        tmp = '\cite{'+ r.group(2) + '}'
+        if r.group(1) is not None:
+            tmp = r.group(1) + tmp
+        if r.group(3) is not None:
+            tmp = tmp + r.group(3)
+        return tmp
+
+df['t2']=df['t2'].apply(lambda x: int(x) if x!='' else 0)
+#mask = (df['t2']+df['kind'].apply(lambda x: -100 if 'survey' in x else 0))>0
+mask = (df['t2']+df['kind'].apply(lambda x: -100 if 'survey' in x else -20 if 'study' in x else 0))>0
+df = df[mask]
+del df['t2']
+del df['kind']
+
+df['year'] = df['year'].apply(int)
+df = df.sort_values(by ='year')
+df['main'] = df['main'].apply(lambda x: str(x).capitalize() )
+#df['main'] = df['main'].apply(lambda x: str(x).capitalize() )+' '+df['year'].apply(str)
+#del df['year']
+#df.rename(columns={"main": "paper"})
+
+#H = H[0:1] + [''] + H[3:]
+
+df = df.applymap(format_cite)
+
+def format_row(x, i):
+    tmp = list(map(str,x))
+    for j in range(len(tmp)):
+        pass
+      #  if "\\\\" in tmp[j]:
+      #      tmp[j] = '\\makecell{' + tmp[j] + '}'
+    if i%2==0:
+        tmp[0] = '\rowcolor{gray!25} '+ tmp[0]
+    return tmp
+
+r = [None]+[H]+[None]+list([format_row(x,i) for i,x in enumerate(df.values)])+[None]
+
+return(r)
+#+end_src
+
+#+latex:\begin{center}\scriptsize
+#+TBLNAME: classification2
+#+CAPTION: Classification part 2, test's co-evolution [?:\nbsp{}not mentioned, N/A:\nbsp{}not\nbsp{}attributable]
+#+ATTR_LATEX: :environment longtable :options c :align m{1.9cm}m{0.39cm}m{0.35cm}||m{1.5cm}|m{1.1cm}|m{.9cm}|m{1.1cm}|m{2cm}|m{.9cm}|m{1.2cm}
+#+RESULTS: classification2
+|--------------------------------------+------+---------------------------------+------------------------+-----------------+--------------+-----------------+------------------------------+------------+----------|
+| Reference                            |      |                                 | Language               | Impact Analysis | Kind of test | Type            | Target                       | Automation | Analysis |
+|--------------------------------------+------+---------------------------------+------------------------+-----------------+--------------+-----------------+------------------------------+------------+----------|
+| \rowcolor{gray!25} Adamapoulos \etal | 2004 | \cite{adamopoulos2004overcome}  | Fortan-77              | offline         | unit         | amplification   | tests inputs                 | auto       | genetic  |
+| Halfond \etal                        | 2008 | \cite{halfond2008automated}     | java, PHP, http,...    | offline         | ?            | repair          | calls in general             | semi[fn:3] | static   |
+| \rowcolor{gray!25} Memon \etal       | 2008 | \cite{memon2008automatically}   | all                    | offline         | unit[fn:6]   | repair          | whole tests                  | semi[fn:4] | dynamic  |
+| Thummalapenta \etal                  | 2009 | \cite{thummalapenta2009mseqgen} | java                   | offline         | unit         | augmentation    | tests calls and parameters   | semi[fn:3] | static   |
+| \rowcolor{gray!25} Daniel \etal      | 2010 | \cite{daniel2010test}           | java, .NET             | offline         | unit         | repair          | whole tests                  | semi[fn:3] | symbolic |
+| Fraser \etal                         | 2011 | \cite{fraser2011evosuite}       | java                   | offline         | unit         | generate        | whole tests                  | semi       | dynamic  |
+| \rowcolor{gray!25} Robinson \etal    | 2011 | \cite{robinson2011scaling}      | java                   | offline         | unit[fn:6]   | generate        | whole tests                  | auto       | static   |
+| Jin \etal                            | 2012 | \cite{jin2012bugredux}          | C                      | N/A[fn:5]       | unit         | generate        | tests calls and inputs       | auto       | dynamic  |
+| \rowcolor{gray!25} Galeotti \etal    | 2013 | \cite{galeotti2013improving}    | java                   | N/A[fn:5]       | unit         | generation      | tests calls and inputs       | auto       | symbolic |
+| Tonella \etal                        | 2014 | \cite{tonella2014interpolated}  | all                    | offline         | all          | generate        | tests event                  | semi[fn:3] | dynamic  |
+| \rowcolor{gray!25} Mirzaaghaei \etal | 2014 | \cite{mirzaaghaei2014automatic} | java                   | offline         | all          | repair,generate | whole tests                  | auto       | static   |
+| Fraser \etal                         | 2014 | \cite{fraser2014automated}      | java                   | N/A[fn:5]       | unit         | generate        | tests calls and inputs       | auto       | static   |
+| \rowcolor{gray!25} Khelladi \etal    | 2017 | \cite{khelladi2017semi}         | OCL                    | offline         | N/A[fn:2]    | repair          | whole models and constraints | semi[fn:4] | static   |
+| Kampmann \etal                       | 2019 | \cite{alex2019bridging}         | web-python-sql-C stack | offline         | unit         | generate        | whole tests                  | auto       | dynamic  |
+|--------------------------------------+------+---------------------------------+------------------------+-----------------+--------------+-----------------+------------------------------+------------+----------|
+
+#+latex:\end{center}
+
+** Language characteristics
+We were able to extract some redeeming characteristics through the different approaches.
+As shown in Tables [[classification1]] and [[classification2]] most of the approaches that we found focus on Object Oriented languages.
+In particular they use the /Class/ construct
+and heavy type systems available statically,
+like Java,.NET and C++.
+These approaches seem to correlates strongly with techniques such as static analysis and patterns recognition.
+Nonetheless some approaches do not rely on particular characteristics of languages in themselves, 
+like class and static types but they rely on the runtime behavior of the program.
+These approaches use events at some points with dynamic analysis to produce behavioral models cite:jin2012bugredux,alex2019bridging,memon2008automatically.
+We also found a few approaches working Declarative constraints systems cite:khelladi2017semi,
+or on database language paradigms cite:zhang2011automatic,alex2019bridging.
+# We can observe a correlation between the analyzed language and the analysis method.
+# Here most paper analyzing javascript uses dynamic analysis,
+# and if they do not update tests themselves they don't even use static analysis. 
+# But on Java and other languages using the /Class/ paradigm static analysis seem enough.
+
+# In the presented papers, two major languages can be distinguished.
+# On one hand, Java  with ??.
+# On the other hand, javascript with ??.
+# It seem to greatly impact choice of authors on our other features.
+# Mainly the abstraction used for the analysis. 
+
+# # \color{red}
+
+# model co-evolution, mostly OO with class cite:hebig2016approaches,khelladi2017semi .
+# java cite:zaidman2008mining cite:levin2017co cite:mirzaaghaei2014automatic
+
 ** Degree of automation
-trade-off between flexibility and ease of analysis, ex. type annotations.
-** Detection
-*** type of change
+The criterion of the degree of automation will be discussed several times 
+in the next sections under other points of view.
+So we will be quick here with only a general comment on the tables classifying approaches. 
+# So here we will only focus on the overall implications 
+# and comment a little on Tables 1 and 2 on this topic.
+In both Tables [[classification1]] and [[classification2]], the automation criterion refers to the approach in general 
+and not only on evolution or co-evolution,
+as it was very difficult to distinguish both without trying to reproduce experiments.
+
+# \color{red}
+# trade-off between flexibility and ease of analysis, ex. type annotations.
+
+#  Manual.
+#  Semi automated because lack of information, this info can be given by developer or mine through further analysis.
+#  Automated repair/generation, either with proven evolution or high quality heuristic with one solution.
+
+# # This concept will be discussed multiple times from the point of view of other features.
+
+# Handle certain very particular patterns
+# or
+# Recommend/detect loosely in general
+
+# - Automatic test repair/augmentation/generation
+# - Automatic code repair
+# - Co-evolution recommendation, semi automated co-evolution
+# - Automatic change detection
+
+# \color{black}
+** Evolution of the Implementation
+*** Granularity
+# The approaches that we classified in Table [[classification2]] as /generate/ for the type of action made on tests
+# do not explicitly mention the use of evolution to improve their results.
+
+Table [[classification1]] shows a correlation between the granularity of changes
+and the automation of the corresponding approach,
+where approaches using composed changes require more manual intervention.
+The cause of this correlation seems to be that approaches using composed evolution 
+are more complex although they can handle a greater variety of evolution.
+
+# \color{red}
+# Many approaches do not use evolution and may only use an unique version,
+# thus there is no granularity of evolution to consider cite:fraser2011evosuite,daniel2010test.
+# # j NO CLAIM on change granu so no change granu
+# \color{black}
+
+All approaches considering evolution use some degree of composed changes,
+Dagenais et /al./ use some basic compositions in cite:dagenais2011recommending,dagenais2014using,
+for example, renaming is composed of the deletion of a name
+and the addition of a new one,
+here the authors consider the case of in-place renaming, 
+so it is easier to infer the relation between the deletion and addition.
+
+# But in the end most approaches are using some kinds of composed changes.
+# Moreover the techniques to compose atomic changes vary greatly.
+# Some articles present 
+# ?? blabla
+
+It should be noted that some security approaches
+which uses dynamic analysis and finite state machine inference
+are doing a special kind of change detection using a fixed initial state cite:jiang2006multiresolution.
+They actually try to detect behavioral changes from the runtime.
+
+#  fine grained cite:levin2017co.
+
+#  cite:mirzaaghaei2014automatic
+
+# change operations on models, online detection cite:khelladi2017semi
+
+# (functional) Test -- Implementation -- Specification (declarative)
+**** more   :noexport:
+#+NAME: granularitytable1
+#+begin_src python :exports results :hlines yes :colnames no :var val=2 :var data=interm
+import pandas as pd
+import numpy as np
+import re
+import bibtexparser
+
+d = {}
+with open('references.bib') as bibtex_file:
+    bib_database = bibtexparser.load(bibtex_file)
+    for x in bib_database.entries:
+        d[x['ID']]=x
+
+h = ['ref']
+df = pd.DataFrame(data[2:],columns=data[0])
+df = df[h].reindex(h, axis=1)
+prog = re.compile(r"^(?:(.*?) )?cite:([^\s]*)(.*)$") # cite:(.*) (.*)")
+def format_cite(x):
+    r = prog.match(str(x))
+    if r is None:
+        return x
+    else:
+        tmp = '\cite{'+ r.group(2) + '}'
+        if r.group(1) is not None:
+            tmp = r.group(1) + tmp
+        if r.group(3) is not None:
+            tmp = tmp + r.group(3)
+        return tmp
+def access_bib(k):
+    def f(x):
+        r = prog.match(str(x))
+        if r is None:
+            return x
+        else:
+            return d[r.group(2)][k]
+    return f
+
+df['author'] = df['ref'].apply(access_bib('author'))
+df['title'] = df['ref'].apply(access_bib('title'))
+df = df.applymap(format_cite)
+
+def format_row(x, i):
+    tmp = list(x)
+    for j in range(len(tmp)):
+        tmp[j]=str(tmp[j]).replace('\n',' ')
+    return tmp
+
+r = list([format_row(x,i) for i,x in enumerate(df[['ref','title']].values)])
+
+return(r)
+#+end_src
+
+#+RESULTS: granularitytable1
+| \cite{wang2017behavioral}            | Behavioral Execution Comparison: Are Tests Representative of Field Behavior?                                                           |
+| \cite{jin2012bugredux}               | BugRedux: reproducing field failures for in-house debugging                                                                            |
+| \cite{alex2019bridging}              | Bridging the Gap between Unit Test Generation and System Test Generation                                                               |
+| \cite{hindle2012naturalness}         | On the naturalness of software                                                                                                         |
+| \cite{jiang2006multiresolution}      | Multiresolution Abnormal Trace Detection Using Varied-Length $ n $-Grams and Automata                                                  |
+| \cite{beschastnikh2013unifying}      | Unifying FSM-inference algorithms through declarative specification                                                                    |
+| \cite{tonella2014interpolated}       | Interpolated n-grams for model based testing                                                                                           |
+| \cite{hebig2016approaches}           | Approaches to co-evolution of metamodels and models: A survey                                                                          |
+| \cite{khelladi2018change}            | Change Propagation-based and Composition-based Co-evolution of Transformations with Evolving Metamodels                                |
+| \cite{khelladi2017semi}              | A semi-automatic maintenance and co-evolution of OCL constraints with (meta) model evolution                                           |
+| \cite{zaidman2008mining}             | Mining software repositories to study co-evolution of production \& test code                                                          |
+| \cite{zaidman2011studying}           | Studying the co-evolution of production and test code in open source and industrial developer test processes through repository mining |
+| \cite{levin2017co}                   | The co-evolution of test maintenance and code maintenance through the lens of fine-grained semantic changes                            |
+| \cite{gall2009change}                | Change analysis with evolizer and changedistiller                                                                                      |
+| \cite{martinez2019coming}            | Coming: a tool for mining change pattern instances from git commits                                                                    |
+| \cite{levin2017boosting}             | Boosting automatic commit classification into maintenance activities by utilizing source code changes                                  |
+| \cite{schafer2008mining}             | Mining framework usage changes from instantiation code                                                                                 |
+| \cite{andreasen2017survey}           | A survey of dynamic analysis and test generation for JavaScript                                                                        |
+| \cite{zhu1997software}               | Software unit test coverage and adequacy                                                                                               |
+| \cite{mirshokraie2013efficient}      | Efficient JavaScript mutation testing                                                                                                  |
+| \cite{gyimesi2019bugsjs}             | Bugsjs: A benchmark of javascript bugs                                                                                                 |
+| \cite{richards2010analysis}          | An analysis of the dynamic behavior of JavaScript programs                                                                             |
+| \cite{anand2013orchestrated}         | An orchestrated survey of methodologies for automated software test case generation                                                    |
+| \cite{pinto2012understanding}        | Understanding myths and realities of test-suite evolution                                                                              |
+| \cite{arcuri2011adaptive}            | Adaptive random testing: An illusion of effectiveness?                                                                                 |
+| \cite{xu2010directed}                | Directed test suite augmentation: techniques and tradeoffs                                                                             |
+| \cite{marsavina2014studying}         | Studying fine-grained co-evolution patterns of production and test code                                                                |
+| \cite{mirzaaghaei2014automatic}      | Automatic test case evolution                                                                                                          |
+| \cite{fraser2011evosuite}            | EvoSuite: automatic test suite generation for object-oriented software                                                                 |
+| \cite{daniel2010test}                | On test repair using symbolic execution                                                                                                |
+| \cite{arcuri2007coevolving}          | Coevolving programs and unit tests from their specification                                                                            |
+| \cite{person2009differential}        | Differential symbolic execution                                                                                                        |
+| \cite{hassan2009predicting}          | Predicting faults using the complexity of code changes                                                                                 |
+| \cite{dagenais2011recommending}      | Recommending adaptive changes for framework evolution                                                                                  |
+| \cite{halfond2008automated}          | Automated identification of parameter mismatches in web applications                                                                   |
+| \cite{vcubranic2003hipikat}          | Hipikat: Recommending pertinent software development artifacts                                                                         |
+| \cite{xing2006refactoring}           | Refactoring practice: How it is and how it should be supported-an eclipse case study                                                   |
+| \cite{levin2016using}                | Using temporal and semantic developer-level information to predict maintenance activity profiles                                       |
+| \cite{memon2008automatically}        | Automatically repairing event sequence-based GUI test suites for regression testing                                                    |
+| \cite{thummalapenta2009mseqgen}      | MSeqGen: Object-oriented unit-test generation via mining source code                                                                   |
+| \cite{robinson2011scaling}           | Scaling up automated test generation: Automatically generating maintainable regression unit tests for programs                         |
+| \cite{tsantalis2018accurate}         | Accurate and efficient refactoring detection in commit history                                                                         |
+| \cite{arcuri2008automation}          | On the automation of fixing software bugs                                                                                              |
+| \cite{arcuri2008multi}               | Multi-objective improvement of software using co-evolution and smart seeding                                                           |
+| \cite{arcuri2008novel}               | A novel co-evolutionary approach to automatic software bug fixing                                                                      |
+| \cite{papadakis2019mutation}         | Mutation testing advances: an analysis and survey                                                                                      |
+| \cite{jia2010analysis}               | An analysis and survey of the development of mutation testing                                                                          |
+| \cite{adamopoulos2004overcome} *     | How to overcome the equivalent mutant problem and achieve tailored selective mutation using co-evolution                               |
+| \cite{zhang2011automatic}            | Automatic generation of load tests                                                                                                     |
+| \cite{nistor2015caramel}           ? | Caramel: Detecting and fixing performance problems that have non-intrusive fixes                                                       |
+| \cite{beller2015how}                 | When, how, and why developers (do not) test in their IDEs                                                                              |
+| \cite{freeman2002software}           | Software testing                                                                                                                       |
+| \cite{hedin2014jsflow}               | JSFlow: Tracking information flow in JavaScript and its APIs                                                                           |
+| \cite{dhondt2002coevolution}         | Co-evolution of object-oriented software design and implementation                                                                     |
+| \cite{leotta2013capture}             | Capture-replay vs. programmable web testing: An empirical assessment during test case evolution                                        |
+
+*** Abstraction
+Both Tables [[classification1]] and [[classification2]] show that the abstraction of choice is the class construct.
+
+# The chosen abstraction seem to be correlated to the language and paradigms.
+# Such that most article processing java are using the class abstraction.
+# While the one processing javascript are using call graphs or flow and events graphs with dynamic analysis cite:mirshokraie2013efficient.
+
+Some approaches make use of metadata to mine patterns in Content Versioning Systems (CVS).
+Zaidman et /al./ in cite:zaidman2008mining,zaidman2011studying mine co-evolution patterns in SVN commits,
+while
+Martinez et /al./ in cite:martinez2019coming mine co-evolution patterns in git commits.
+
+We were also able to find some studies classifying changes.
+Here they use statistics and learning algorithms to predict the type of changes cite:marsavina2014studying,levin2016using,levin2017boosting .
+They combine the class abstraction with metadata from
+CVS that are analyzed through Natural Language Processing (NLP).
+# Some approaches use statistics and learning based method to be less language dependent,
+# the observable consequence here is that they use
+# a great variety of abstraction. 
+# From words for natural language processing based approaches .
+# To metadata in available
+*** Detection
+With the exception of Khelladi et /al./ in cite:khelladi2018change,khelladi2017semi 
+who are able to detect changes online
+because models design has been historically supported in many graphical interfaces.
+Just as shown in Table [[classification1]], 
+most of the approaches that we found use offline detection.
+These approaches deal with contents that can be edited in many ways, 
+making it difficult to change each editing mode.
+Thus, these articles rely either on file metadata and file diffs to detect changes 
+cite:mirzaaghaei2014automatic,daniel2010test,halfond2008automated,
+metadata of CVS and blob differences
+cite:martinez2019coming,hassan2009predicting,dagenais2011recommending,vcubranic2003hipikat,tsantalis2018accurate,
+or behavioral differences
+cite:memon2008automatically,jiang2006multiresolution.
+# change operations on models, online detection cite:khelladi2017semi
+
+
+# automation, human interventions
+*** type of change                                                 :noexport:
+
 cite:gyimesi2019bugsjs
-cite:khelladi2018hal
-cite:khelladi2017semi
-** Evolution
-Manual.
-Semi automated because lack of information, this info can be given by developer or mine through further analysis.
-Automated repair/generation, either with proven evolution or high quality heuristic with one solution.
+# cite:khelladi2018change
+# cite:khelladi2017semi
+** Co-evolution of tests
+In this section we found many article doing tests co-evolution.
+We also found approaches that were not exactly co-evolving tests but are still relevant to consider.
+They do not call their approach co-evolution but they share many tools and algorithms.
+This increased variety of approaches could be beneficial to the internship.
 
-cite:mirzaaghaei2014automatic
+# One one hand, 
+# many of the articles that we found talking about co-evolution of tests are not actually doing co-evolution,
+# but they study and mine repositories to find patterns and categories in the evolution of software projects.
+# Some are trying to classify changes between /corrective/, /perfective/ and /adaptative/ cite:levin2017boosting [??].
+# Other try to find patterns that could correlate to other software quality metrics
+# cite:zaidman2011studying [??].
+# One the other hand,
+# many articles improve tests and code in general without the need of changes.
+# Mutation testing introduce mutations in code to evaluate and improve tests [??].
+# Early approach to test generation started with easily accessible information,
+# like function signatures [??] or basic flow graphs [??].
 
-test generation cite:andreasen2017survey cite:alex2019bridging.
-fine grained cite:levin2017co.
-** Analysis method
-Impact of change.
-Data for amplifying test.
-cite:hindle2012naturalness
-*** Static analysis
-Nécéssite des informations de type (annoté ou inféré).
-Peut verifier des propiété sur des domaines infini de manière exaustives.
-Efficasse sur des programmes simples mais pouvant accépté un grand nombre d'entrées.
-Typing, even languages that don't have types can start to use type rules e.g. monotype in C with everything is an int, can check for null déréferencing that is dereferencing 0.
-In program analysis we always have a type Top and a type Bottom, making type analysis more robust and flexible in practice (incremental typing/ type inference).
+ # Manual.
+ # Semi automated because lack of information, this info can be given by developer or mine through further analysis.
+ # Automated repair/generation, either with proven evolution or high quality heuristic with one solution.
 
-spoon
-typescript
-semantic
-*** Dynamic analysis
-Particularly suitable for highly dynamic and not very typified languages.
-Cannot provide absolute guarantees on an infinite domain.
-As close as possible to the actual use of the program.
-Effective on potentially complex programs but accepting few inputs.
+ # cite:mirzaaghaei2014automatic
 
-JSFlow cite:hedin2014jsflow.
-cite:richards2010analysis.
-cite:andreasen2017survey.
-cite:jiang2006multiresolution.
-cite:beschastnikh2013unifying.
-*** Hybrid analysis
-Dans beaucoup de future work d'articles du domaine, et dans quelques contribution mineures.
-Supporte l'analyse statique en apportant des informations facilements accessibles au runtime.
-Supporte l'analyse dynamique en l'orientant vers les points sensibles détécter au cours de l'analyse statique.
-Se servir des tests pour récolter de l'information au runtime et améliorer des déduction de l'analyse statique.
-Se servir de l'analyse statique pour détecter des morceau de programmes sensibles et ansi les tester et les instrumenter pour mieux les comprendre et détecter les bugs.
-cite:andreasen2017survey
-**** Mutation testing
-Changer la syntaxe d'un programme tout en tentant concever la même semantique de façon à tester des cas particuliers et rendre le code plus robuste. 
-cite:mirshokraie2013efficient
+*** Impact Analysis
+- Analysis mode ::
+  All the articles retained in the state of the art are doing offline impact analysis.
+  There is therefore either no need for test co-evolution during code changes, 
+  or the current test co-evolution techniques are too expensive to react to each change. 
+ # J get content from analysis method
+ # Maybe mutant testing is not
+
+- Analysis methods :: We found different methods of impact analysis.
+
+  *Static analysis* is the most wide spread type of analysis here, as shown in Tables [[classification1]] and [[classification2]].
+  The causes of this distribution seem to be due to the large amount of semantic 
+  and structural information available in strongly typed object-oriented languages such as Java,
+  
+  On the contrary, *dynamic analysis* does not appear to be very common,
+  in fact, dynamic analysis is particularly suitable 
+  for highly dynamic and weakly typed languages, such as Javascript and Perl.
+  But it requires to go down to the runtime of the program 
+  which causes a performance penalty and an increase in complexity.
+  Nonetheless in cite:alex2019bridging Kampmann at /al./ use dynamic analysis
+  to synthesize unit tests from system tests through the use of behavioral models and fsm inference algorithms.
+  
+  Mirshokraie et /al./ in cite:mirshokraie2013efficient then in cite:mirshokraie2015jseft,mirshokraie2016atrina
+  combine dynamic analysis and *mutation testing* to improve tests of Javascript programs.
+ 
+  # cite:jiang2006multiresolution.
+  # cite:beschastnikh2013unifying.
+  # cite:richards2010analysis.
+  *Hybrid analysis* seem to be in many future works cite:andreasen2017survey
+  but we did not find approaches explicitly claiming it in the context of co-evolution.
+*** Kind of tests
+We found no approaches claiming to be able to repair or generate system tests.
+So the hypothesis on the computational complexity of these approaches does not seem invalid.
+
+# Nonetheless some approaches make use of versions to check and improve tests [??]
+
+Kampmann et /al./ in cite:alex2019bridging use system tests to generate new unit tests.
+Mirshokraie et /al./ in cite:mirshokraie2016atrina also use system tests but in the from of GUI tests to generate new unit tests.
+
+# Hassan in cite:hassan2009predicting 
+
+Memon et /al./ in cite:memon2008automatically generate unit tests in the particular case of regression testing.
+Here the regression testing allows the creation of oracles from the program current behavior.
+
+Khelladi et /al./ cite:khelladi2017semi do not co-evolve tests but a very close artifact.
+In fact, they co-evolve OCL, a declarative constraint language on models such as class diagrams.
+Here specifying constraints is very similar to specifying oracles.
+*** Target
+**** Calls                                                           :ignore:
+Tonella et /al./ cite:tonella2014interpolated and Jiang et /al./ cite:jiang2006multiresolution 
+use traces and fsm to construct a functional behavioral model of an application,
+then they generate new tests as skeletons of *calls* from paths in the fsm.
+Halfond et /al./ cite:halfond2008automated detect parameter mismatch in multi-languages systems.
+Dagenais et /al./ cite:dagenais2011recommending,dagenais2014using recommend alternatives for broken calls and for general references.
+Fraser et /al./ cite:fraser2014automated produce tests composed of calls and inputs from java generics.
+# the smallest non already tested sequences.
+**** Inputs                                                          :ignore:
+  # They can be computed by symbolic execution 
+ Daniel et /al./ cite:daniel2010test compute new *inputs* for tests that maximize coverage through symbolic execution.
+ Adamopoulos et /al./ cite:adamopoulos2004overcome amplify inputs through mutation testing and genetic algorithms.
+ Zhang et /al./ cite:zhang2011automatic amplify tests for database systems through the use of symbolic execution and genetic algorithms.
+**** Oracles                                                         :ignore:
+  # All the fully automated approaches that try to co-evolve test are doing repair 
+  # To produce oracles [??] use symbolic execution.
+  Table [[classification2]] shows that fully automated approaches generating (non regression) 
+  unit tests are not producing tests with *oracles*.
+  With Kampmann et /al./ and Mirshokraie et /al./ as exceptions 
+  in cite:alex2019bridging and cite:mirshokraie2015jseft,mirshokraie2016atrina because these approaches borrow 
+  oracles from system tests (such as GUI tests) to generates unit tests.
+  combine dynamic analysis and *mutation testing* to improve tests of Javascript programs.
+  In facts, oracles are part of the application specification,
+  thus there can not be automatically generated.
+  To overcome this restriction, Mirzaaghaei et /al./ cite:mirzaaghaei2014automatic 
+  use oracles from other tests,
+  Kampmann et /al./ cite:alex2019bridging run system tests with the same inputs as unit tests 
+  to reduce false positives triggered by oracles in unit tests 
+  (if an oracle from an unit test fails, the corresponding system test should also fail).
+  Khelladi et /al./ cite:khelladi2017semi repair constraints which is very similar to repairing oracles.
+  
+*** Type
+
+# Table [[classification2]] show our 3 types of co-evolution in almost equal parts.
+
+Robinson et /al./ cite:robinson2011scaling use static analysis to generate tests then mutation testing to refine generated tests.
+# Fraser et /al./ cite:fraser2014automated generate unit tests for methods typed with Java generics using particularities of generics.
+Kampmann et /al./ cite:alex2019bridging synthesize unit tests from system tests.
+
+# The *generation* of new tests is much more mature than the repairing.
+# In facts,
+# cite:robinson2011scaling,jin2012bugredux,alex2019bridging
+# # cite:arcuri2008multi cite:arcuri2008novel cite:zhang2011automatic cite:wang2017behavioral
+# are generating new tests, and present very different approaches and algorithms.
+# Then continuing on tests *amplification*.
+# Mirshokraie et /al./ in cite:mirshokraie2015jseft,mirshokraie2016atrina
+
+Mirzaaghaei et /al./ cite:mirzaaghaei2014automatic amplify and repair unit tests 
+using carefully handcrafted patterns that matches certain evolution.
+However creating these pattern can be tedious.
+A partial solution to this problem could come from Khelladi et /al./ in cite:khelladi2018change, 
+who are combining repairing rules to co-evolve models given changes in metamodels.
+
+Daniel et /al./ cite:daniel2010test repair tests using symbolic execution, 
+more specifically they focus on repairing string literals.   
+Memon et /al./ cite:memon2008automatically repair regression GUI tests, 
+more specifically they repair the sequence of GUI events,
+sometimes it needs manual interventions when the approach does not find an appropriate resolution.
+
+# cite:adamopoulos2004overcome
+# cite:thummalapenta2009mseqgen 
+.
+
+# cite:khelladi2017semi cite:arcuri2008automation cite:arcuri2007coevolving
+# cite:halfond2008automated   
+# are *repairing* tests, by mostly focusing on Java and
+# essentially analyzing the classes.
+# Moreover the most accurate approaches rely on
+# very specific hand made patterns cite:mirzaaghaei2014automatic,
+# Going away from testing,
+
+# Yet there are going to more flexibility as ?? uses a learning based method to learn pattern from user fixes.
+# ??? are using genetic algorithms.
+
+# Nonetheless repairing is more difficult as possible fixes tend to be few, considering that it should make the smallest fix possibles.
+
+# Symbolic execution is becoming a common approach between generating and repairing tests.
+
+# survey test generation cite:andreasen2017survey 
+
+#  fine grained cite:levin2017co.
+
+**** almost good                                                   :noexport:
+| cite:thummalapenta2009mseqgen | generate |
+| cite:robinson2011scaling      | generate |
+| cite:arcuri2008multi          | generate |
+| cite:arcuri2008novel          | generate |
+| cite:zhang2011automatic       | generate |
+| cite:wang2017behavioral       | generate |
+| cite:jin2012bugredux          | generate |
+| cite:alex2019bridging         | generate |
+| cite:andreasen2017survey      | generate |
+| cite:anand2013orchestrated    | generate |
+| cite:xu2010directed           | generate |
+| cite:marsavina2014studying    | generate |
+| cite:fraser2011evosuite       | generate |
+| cite:arcuri2007coevolving     | repair |
+| cite:levin2017co              | repair   |
+| cite:khelladi2017semi         | repair   |
+| cite:khelladi2018change       | repair   |
+| cite:mirzaaghaei2014automatic | repair   |
+| cite:daniel2010test           | repair   |
+| cite:arcuri2008automation     | repair   |
+| cite:halfond2008automated     | repair   |
+| cite:memon2008automatically   | repair   |
+# | cite:nistor2015caramel        | fix code   |
+
+
+**** bit filtered                                                  :noexport:
+| kind          | my                       | year | main          | artifacts relations                     | parad | ref                                | language         | analysis     | objectives          | test            | histo | dyngranu   | granularity | abstraction      | detection | target       | automation | type       | impact  | usable thg  | T  | compare_eval                          | eval objects, resources                      | impact Sci           | num | reading issues |
+|---------------+--------------------------+------+---------------+-----------------------------------------+-------+------------------------------------+------------------+--------------+---------------------+-----------------+-------+------------+-------------+------------------+-----------+--------------+------------+------------+---------+-------------+----+---------------------------------------+----------------------------------------------+----------------------+-----+----------------|
+| survey        | M1, compare 4 tools      | 2017 | wang          | system test \rightarrow unit test       | E     | cite:wang2017behavioral            | java             | dynamic      | find best metric    | unit            | no    | 2 events   | /           | instruction      | /         | calls        | /          | generate   | offline | /           | TT | coverage,mutation,temporal invariant  | JetUML,Log4j,Common {IO,Lang}                | more than mutation t |     |                |
+| technical     | M1, used LLVM            | 2012 | jin           | production \rightarrow test             | E     | cite:jin2012bugredux               | C                | dynamic      | repro fail in house | unit            | no    | events     | /           | class-flow graph | /         | calls+inputs | auto       | generate   | no      | tool(avail) |    | time space overhead, eff{ctivi,icien} | [16,23]->SIR[21],BugBench[22],exploit-db[23] | in house reprod      |     |                |
+| technical     | M1,Kim et al.[12]        | 2019 | alex          | system test \rightarrow unit test       | D     | cite:alex2019bridging              | web/python/sql/C | dynamic      | param unit test ??  | unit            | no    | failure    | /           | flow graph       | /         | all          | auto       | generate   | dyntest | proto       |    | coverage,coverage over time,lifting   | GNU coreutils,sed,dc                         | accu of sys to unit  |     |                |
+| survey        |                          | 2016 | hebig         |                                         |       | cite:hebig2016approaches           |                  |              | co-evo approach     |                 |       |            |             |                  |           |              |            | / repair   |         |             |    |                                       |                                              |                      |  10 |                |
+| technical     | init                     | 2018 | khelladi      | metamodel \rightarrow model             | C     | cite:khelladi2018change            | UML like         | static       | compose resol       | /               | yes   | no         | composed    | class            | online    | model        | auto,semi  | repair     | offline | tool        | M  | correctness                           | many models                                  |                      |   0 |                |
+| technical     | init                     | 2017 | khelladi      | model/constraint OCL $\circlearrowleft$ | C,D   | cite:khelladi2017semi              | OCL              | static       | also co-evolve OCL  | /               | yes   | no         | composed    | class            | online    | model/constr | auto,semi  | repair     | offline | tool        | M  |                                       |                                              |                      |   1 |                |
+| survey        | googleS                  | 2017 | andreasen     | runtime->test                           | Dy    | cite:andreasen2017survey           | js               | dynamic      | test gen js         | all             |       |            |             |                  |           |              |            | generate   |         |             |    |                                       |                                              |                      |     |                |
+| book          | test coverage, criterion | 1997 | zhu           |                                         |       | cite:zhu1997software               |                  |              | base unit test cov  |                 |       |            |             |                  |           |              |            | ??gen      |         |             |    |                                       |                                              |                      |     |                |
+| technical     | googleS,mutation         | 2013 | mirshokraie   | code                                    | Dy    | cite:mirshokraie2013efficient      | js               | static/dyn   | mut, fast/eval test | all             | no    |            | /           | call graph       | /         | /            | auto       | /          | ??offl  | tool        |    | non-equiv mutant,fault severity       | SimpleCart,JQuery,...                        |                      |     |                |
+| benchmark     | googleS                  | 2019 | gyimesi       |                                         | Dy    | cite:gyimesi2019bugsjs             | js               | /            | bench things        | /               | /     | /          | /           | /                | /         | /            | /          | /          | /       | bench       |    |                                       |                                              |                      |     |                |
+| analysis      | googleS                  | 2010 | richards      |                                         | Dy    | cite:richards2010analysis          | js               |              | how dyn js work     |                 |       |            |             |                  |           |              |            | /          |         |             |    |                                       |                                              |                      |     |                |
+| survey        | test gen                 | 2013 | anand         |                                         | I,OO  | cite:anand2013orchestrated         | java             | random       | find new tests      |                 |       |            |             |                  |           |              |            | generate   |         |             | G  |                                       |                                              |                      |     |                |
+| study         |                          | 2012 | pinto         | test  ?                                 |       | cite:pinto2012understanding        |                  |              | debunk              |                 |       |            |             |                  |           |              |            | ??/        |         |             |    |                                       |                                              |                      |   9 |                |
+| study         |                          | 2011 | arcuri        |                                         |       | cite:arcuri2011adaptive            |                  |              | debunk              |                 |       |            |             |                  |           |              |            | ??/        |         |             |    |                                       |                                              |                      |     |                |
+| study         |                          | 2010 | xu            | code \rightarrow test                   | I     | cite:xu2010directed                | C                | gene,symb    | augmentation        | unit            | yes   | regression | /           | branch           |           | all          | auto       | generate   | offline |             |    |                                       | from SIR                                     |                      |     |                |
+| study         | googleS                  | 2014 | marsavina     | production \rightarrow pattern->test    | OO    | cite:marsavina2014studying         | java             | static       | ana-mine-fix        |                 | yes   |            | composed    | all,branch cover | offline   | all          | >manu      | generate   | ??off   |             | T  |                                       | CommonsLang,CommonsMath,Gson,PMD,JFreeChart  |                      |   5 |                |
+| technical     | init                     | 2014 | mirzaaghaei   | code \rightarrow test                   | C,I   | cite:mirzaaghaei2014automatic      | java             | static       | repair,8 co-evo pat | Unit/all        | yes   | no         | atomic??    | class            | offline   | all          | auto       | repair     | offline | algo,tool   | T  | apply freq, repair effectiveness      | JodaTime,Barbecue,JfreChart,PDM,Xstream      | handle java patterns |   3 |                |
+| technical     | googleS                  | 2011 | fraser        | cove->test                              | OO    | cite:fraser2011evosuite            | java             | dynamic      | gen test suite      | ?? unit         | no    |            |             | flow graph       |           |              |            | generate   |         | tool        |    |                                       |                                              |                      |     |                |
+| technical     |                          | 2010 | daniel        | symbolicExec \rightarrow test           | I,OO  | cite:daniel2010test                | java, .NET       | symbolic     | repair              | unit            |       |            |             |                  |           |              |            | repair     |         |             |    |                                       |                                              |                      |     |                |
+| technical     |                          | 2007 | arcuri        |                                         |       | cite:arcuri2007coevolving          |                  | static       | co-evo              |                 |       |            |             |                  |           |              |            | ??all      |         |             |    |                                       |                                              |                      |     |                |
+| phd dissert   |                          | 2009 | person        | symbolicExec                            |       | cite:person2009differential        |                  | symbolic     | symbolic exec       |                 |       |            |             |                  |           |              |            | /          |         |             |    |                                       |                                              |                      |     |                |
+| technical     |                          | 2009 | hassan        | code                                    |       | cite:hassan2009predicting          |                  |              | predicting          |                 |       |            |             |                  |           |              |            | ??/        |         |             |    |                                       |                                              |                      |     |                |
+| technical     | ?                        | 2011 | dagenais      | code-<  ??                              |       | cite:dagenais2011recommending      |                  |              | recommending        |                 |       |            |             |                  |           |              | recommend  | ??/        |         |             |    |                                       |                                              |                      |   7 |                |
+| technical     |                          | 2008 | halfond       |                                         |       | cite:halfond2008automated          |                  |              | param mismatch id   |                 |       |            |             |                  |           |              |            | ??  repair |         |             |    |                                       |                                              |                      |     |                |
+| technical     | cite:khelladi2018change  | 2003 | vcubranic     |                                         |       | cite:vcubranic2003hipikat          |                  |              | ??recommendation    |                 |       |            |             |                  |           |              |            | ?? /       |         |             |    |                                       |                                              |                      |     |                |
+| study         |                          | 2006 | xing          |                                         |       | cite:xing2006refactoring           |                  |              | refactoring how wha |                 |       |            |             |                  |           |              |            | ?? /       |         |             |    |                                       |                                              |                      |     |                |
+| technical     |                          | 2016 | levin         |                                         |       | cite:levin2016using                |                  |              | predict maintenance |                 |       |            |             |                  |           |              |            | ??/        |         |             |    |                                       |                                              |                      |     |                |
+| technical     |                          | 2008 | memon         | ? \rightarrow test                      |       | cite:memon2008automatically        |                  |              | repair              | regression      |       |            |             |                  |           |              |            | repair     |         |             |    |                                       |                                              |                      |     |                |
+| technical     |                          | 2009 | thummalapenta | code \rightarrow test                   |       | cite:thummalapenta2009mseqgen      |                  |              | generation          | unit            |       |            |             |                  |           |              |            | generate   |         |             |    |                                       |                                              |                      |     |                |
+| technical     |                          | 2011 | robinson      | ? ->test                                |       | cite:robinson2011scaling           |                  |              | generation          | regression unit |       |            |             |                  |           |              |            | generate   |         |             |    |                                       |                                              |                      |     |                |
+| technical     |                          | 2018 | tsantalis     | code \rightarrow ?                      | I,OO  | cite:tsantalis2018accurate         | java             | pattern,none | detecting ?? ?? git |                 |       |            |             |                  |           |              |            | ?? /       |         |             | C  |                                       |                                              |                      |     |                |
+| ?? technical  | evolutionary testing     | 2008 | arcuri        |                                         |       | cite:arcuri2008automation          |                  |              | fix bugs            |                 |       |            |             |                  |           |              |            | repair     |         |             |    |                                       |                                              |                      |     |                |
+| technical     |                          | 2008 | arcuri        |                                         |       | cite:arcuri2008multi               |                  |              | improvement         |                 |       |            |             |                  |           |              |            | ??generate |         |             |    |                                       |                                              |                      |     |                |
+|               | co-evolutionary          | 2008 | arcuri        |                                         |       | cite:arcuri2008novel               |                  |              | co-evolutionary     |                 |       |            |             |                  |           |              |            | ??generate |         |             |    |                                       |                                              |                      |     |                |
+| survey        |                          | 2019 | papadakis     |                                         |       | cite:papadakis2019mutation         |                  |              | prove advances mut  |                 |       |            |             |                  |           |              |            | /          |         |             | MT |                                       |                                              |                      |     |                |
+| survey        | tools                    | 2010 | jia           |                                         |       | cite:jia2010analysis               | Java,C,C++,...   |              | prove domain growth |                 |       |            |             |                  |           |              |            | /          |         |             | MT |                                       |                                              |                      |     |                |
+| technical     | mutation testing         | 2004 | adamapoulos   | mutant <-> test                         |       | cite:adamopoulos2004overcome *     |                  |              | mut test            |                 |       |            |             |                  |           |              |            | /          |         |             |    |                                       |                                              | rise of mut with GAs |     |                |
+|               | gen,evol,symbolic        | 2011 | zhang         |                                         |       | cite:zhang2011automatic            | SQL              |              | generation          | load test       |       |            |             |                  |           |              |            | generate   |         |             |    |                                       |                                              |                      |     |                |
+|               |                          | 2015 | nistor        |                                         |       | cite:nistor2015caramel           ? |                  |              | code                |                 |       |            |             |                  |           |              |            | fix code   |         |             |    |                                       |                                              |                      |     |                |
+
+
+
+
+**** bit filtered                                                  :noexport:
+| kind         | type       | my                   | year | main          | artifacts relations                     | parad | ref                                | language         | analysis  | objectives          | test            | histo | dyngranu   | granularity | abstraction      | detection | target       | automation | impact  | usable thg  | T  | compare_eval                          | eval objects, resources                      | impact Sci           | num | reading issues |
+|--------------+------------+----------------------+------+---------------+-----------------------------------------+-------+------------------------------------+------------------+-----------+---------------------+-----------------+-------+------------+-------------+------------------+-----------+--------------+------------+---------+-------------+----+---------------------------------------+----------------------------------------------+----------------------+-----+----------------|
+| survey       | generate   | M1, compare 4 tools  | 2017 | wang          | system test \rightarrow unit test       | E     | cite:wang2017behavioral            | java             | dynamic   | find best metric    | unit            | no    | 2 events   | /           | instruction      | /         | calls        | /          | offline | /           | TT | coverage,mutation,temporal invariant  | JetUML,Log4j,Common {IO,Lang}                | more than mutation t |     |                |
+| technical    | generate   | M1, used LLVM        | 2012 | jin           | production \rightarrow test             | E     | cite:jin2012bugredux               | C                | dynamic   | repro fail in house | unit            | no    | events     | /           | class-flow graph | /         | calls+inputs | auto       | no      | tool(avail) |    | time space overhead, eff{ctivi,icien} | [16,23]->SIR[21],BugBench[22],exploit-db[23] | in house reprod      |     |                |
+| technical    | generate   | M1,Kim et al.[12]    | 2019 | alex          | system test \rightarrow unit test       | D     | cite:alex2019bridging              | web/python/sql/C | dynamic   | param unit test ??  | unit            | no    | failure    | /           | flow graph       | /         | all          | auto       | dyntest | proto       |    | coverage,coverage over time,lifting   | GNU coreutils,sed,dc                         | accu of sys to unit  |     |                |
+| technical    | repair     | init                 | 2018 | khelladi      | metamodel \rightarrow model             | C     | cite:khelladi2018change            | UML like         | static    | compose resol       | /               | yes   | no         | composed    | class            | online    | model        | auto,semi  | offline | tool        | M  | correctness                           | many models                                  |                      |   0 |                |
+| technical    | repair     | init                 | 2017 | khelladi      | model/constraint OCL $\circlearrowleft$ | C,D   | cite:khelladi2017semi              | OCL              | static    | also co-evolve OCL  | /               | yes   | no         | composed    | class            | online    | model/constr | auto,semi  | offline | tool        | M  |                                       |                                              |                      |   1 |                |
+| survey       | generate   | googleS              | 2017 | andreasen     | runtime->test                           | Dy    | cite:andreasen2017survey           | js               | dynamic   | test gen js         | all             |       |            |             |                  |           |              |            |         |             |    |                                       |                                              |                      |     |                |
+| survey       | generate   | test gen             | 2013 | anand         |                                         | I,OO  | cite:anand2013orchestrated         | java             | random    | find new tests      |                 |       |            |             |                  |           |              |            |         |             | G  |                                       |                                              |                      |     |                |
+| study        | generate   |                      | 2010 | xu            | code \rightarrow test                   | I     | cite:xu2010directed                | C                | gene,symb | augmentation        | unit            | yes   | regression | /           | branch           |           | all          | auto       | offline |             |    |                                       | from SIR                                     |                      |     |                |
+| study        | generate   | googleS              | 2014 | marsavina     | production \rightarrow pattern->test    | OO    | cite:marsavina2014studying         | java             | static    | ana-mine-fix        |                 | yes   |            | composed    | all,branch cover | offline   | all          | >manu      | ??off   |             | T  |                                       | CommonsLang,CommonsMath,Gson,PMD,JFreeChart  |                      |   5 |                |
+| technical    | generate   | googleS              | 2011 | fraser        | cove->test                              | OO    | cite:fraser2011evosuite            | java             | dynamic   | gen test suite      | ?? unit         | no    |            |             | flow graph       |           |              |            |         | tool        |    |                                       |                                              |                      |     |                |
+| technical    | repair     | init                 | 2014 | mirzaaghaei   | code \rightarrow test                   | C,I   | cite:mirzaaghaei2014automatic      | java             | static    | repair,8 co-evo pat | Unit/all        | yes   | no         | atomic??    | class            | offline   | all          | auto       | offline | algo,tool   | T  | apply freq, repair effectiveness      | JodaTime,Barbecue,JfreChart,PDM,Xstream      | handle java patterns |   3 |                |
+| technical    | repair     |                      | 2010 | daniel        | symbolicExec \rightarrow test           | I,OO  | cite:daniel2010test                | java, .NET       | symbolic  | repair              | unit            |       |            |             |                  |           |              |            |         |             |    |                                       |                                              |                      |     |                |
+| ?? technical | repair     | evolutionary testing | 2008 | arcuri        |                                         |       | cite:arcuri2008automation          |                  |           | fix bugs            |                 |       |            |             |                  |           |              |            |         |             |    |                                       |                                              |                      |     |                |
+| technical    | ??all      |                      | 2007 | arcuri        |                                         |       | cite:arcuri2007coevolving          |                  | static    | co-evo              |                 |       |            |             |                  |           |              |            |         |             |    |                                       |                                              |                      |     |                |
+| technical    | ??  repair |                      | 2008 | halfond       |                                         |       | cite:halfond2008automated          |                  |           | param mismatch id   |                 |       |            |             |                  |           |              |            |         |             |    |                                       |                                              |                      |     |                |
+| technical    | repair     |                      | 2008 | memon         | ? \rightarrow test                      |       | cite:memon2008automatically        |                  |           | repair              | regression      |       |            |             |                  |           |              |            |         |             |    |                                       |                                              |                      |     |                |
+| technical    | generate   |                      | 2009 | thummalapenta | code \rightarrow test                   |       | cite:thummalapenta2009mseqgen      |                  |           | generation          | unit            |       |            |             |                  |           |              |            |         |             |    |                                       |                                              |                      |     |                |
+| technical    | generate   |                      | 2011 | robinson      | ? ->test                                |       | cite:robinson2011scaling           |                  |           | generation          | regression unit |       |            |             |                  |           |              |            |         |             |    |                                       |                                              |                      |     |                |
+| technical    | ??generate |                      | 2008 | arcuri        |                                         |       | cite:arcuri2008multi               |                  |           | improvement         |                 |       |            |             |                  |           |              |            |         |             |    |                                       |                                              |                      |     |                |
+|              | ??generate | co-evolutionary      | 2008 | arcuri        |                                         |       | cite:arcuri2008novel               |                  |           | co-evolutionary     |                 |       |            |             |                  |           |              |            |         |             |    |                                       |                                              |                      |     |                |
+|              | generate   | gen,evol,symbolic    | 2011 | zhang         |                                         |       | cite:zhang2011automatic            | SQL              |           | generation l inputs | load test       |       |            |             |                  |           |              |            |         |             |    |                                       |                                              |                      |     |                |
+|              | fix code   |                      | 2015 | nistor        |                                         |       | cite:nistor2015caramel           ? |                  |           | code                |                 |       |            |             |                  |           |              |            |         |             |    |                                       |                                              |                      |     |                |
+|              |            |                      |      |               |                                         |       |                                    |                  |           |                     |                 |       |            |             |                  |           |              |            |         |             |    |                                       |                                              |                      |     |                |
+|              |            |                      |      |               |                                         |       |                                    |                  |           |                     |                 |       |            |             |                  |           |              |            |         |             |    |                                       |                                              |                      |     |                |
+*** benefit class                                                  :noexport:
+* Related works
+The problem of co-evolving software has been tackled by many researchers.
+
+For the co-evolution of models,
+problems have been extensively investigated,
+Hebig et al. propose a survey cite:hebig2016approaches.
+# where they compare a large number of tools usable in the industry.
+
+For the co-evolution of tests,
+the research is much more sparse,
+such that there is to our knowledge, no survey on co-evolution of code and tests.
+Nonetheless, there are some exploratory studies on the co-evolution of code and tests,
+where the evolution of tests are empirically accessed in software life-cycles
+cite:leotta2013capture,zaidman2008mining,zaidman2011studying.
+# check ^
+
+There exists also neighbor works to the co-evolution of code and tests,
+be it on test generation or mutation testing.
+In cite:anand2013orchestrated, Anand et /al./ surveyed recent test generation techniques,
+while in cite:andreasen2017survey, Andreasen et /al./ 
+showed the difficulties of test generation in dynamic languages.
+Mutation testing shares some tools and techniques with the co-evolution of code and tests, 
+in cite:jia2010analysis Jia et /al/ organize different such tools.
+# empirical study, the one with many examples ; ISSTA
+
 * Conclusion
-** Future work
-Incremental evolution, with solution that are narrowed trough analysis while always proposing solutions as hints.
-cite:cabot2018wordpress
-# * References                                                         :ignore:
+In this state of the art we have shown a large variety of approaches to the co-evolution code and tests.
+We have seen a majority of approaches working on Java and mostly richly typed OO programming.
+With approaches capable to co-evolve more and more different evolutions.
+Yet they do not consider complex evolution.
+Moreover, recent works have tried to tackle more challenging languages constraints
+such as weakly typed and dynamic language (javascript).
+In the particular case of test generation.
+But we did not find any approaches capable of co-evolving such challenging languages.
+# J We learned take away
+** Future work                                                       :ignore:
+\\
+# Incremental evolution, with solution that are narrowed trough analysis while always proposing solutions as hints.
+As future perspectives this state of the art could lead to a survey, 
+as more time would allow a more systematic review of the field
+along with check the availability of tools.
+One first objective would be to check the feasibility of the co-evolution of tests
+in context were static type information is more scarce like in dynamic languages.
+Some of these languages are very popular for their flexibility.
+But their lack of readily available type information makes it harder to analyze.
+Part of this difficulty seems to have been mitigated by incremental type systems.
+Thus, we hope that more incremental approaches to the co-evolution of code and tests
+would allow making use of tests to further analyze code which will then allow to further improve tests.
+Another objective would be to address tests co-evolution for real world complex evolution.
+* References                                                        :ignore:
+# bibliographystyle:IEEEtran
 bibliographystyle:plain
 bibliography:references.bib
 ** links                                                  :noexport:
 - [[file:../papers/change_propa_compo_co-evo.pdf][pdf]] [[https://hal.archives-ouvertes.fr/hal-02192489/document][Djamel E. Khelladi, Roland Kretschmer, Alexander Egyed: Change Propagation-based and Composition-based Co-evolution of Transformations with Evolving Metamodels. MODELS 2018.]]
 - [[file:../papers/semi-auto_maintenance_co-evo.pdf][pdf]] [[https://www.sciencedirect.com/science/article/pii/S016412121730198X][Djamel E. Khelladi, Reda Bendraou, Regina Hebig, Marie-Pierre Gervais: A semi-automatic maintenance and co-evolution of OCL constraints with (meta)model evolution. JSS 2017.]]
-- [[file:../papers/Automatique_test_case_evolution.pdf][pdf]] [[https://onlinelibrary.wiley.com/doi/pdf/10.1002/stvr.1527?casa_token=8NV-Lu7VHMkAAAAA:cxmcUNC2hvcaHRKAykk36t2lBr7ki-fBQYe60Ca59QkL5RZKZeXwRVvbW2p0wWDOaUT2G0OWw5yRfJ8][Mirzaaghaei, M., Pastore, F., & Pezzè, M. Automatic test case evolution. Software Testing, Verification and Reliability, 24(5), 386-411. 2014.]]
+- [[file:../papers/Automatique_test_case_evolution.pdf][df]] [[https://onlinelibrary.wiley.com/doi/pdf/10.1002/stvr.1527?casa_token=8NV-Lu7VHMkAAAAA:cxmcUNC2hvcaHRKAykk36t2lBr7ki-fBQYe60Ca59QkL5RZKZeXwRVvbW2p0wWDOaUT2G0OWw5yRfJ8][Mirzaaghaei, M., Pastore, F., & Pezzè, M. Automatic test case evolution. Software Testing, Verification and Reliability, 24(5), 386-411. 2014.]]
 - [[file:../papers/co-evo_test-code_maint_fine-grain.pdf][pdf]][[https://arxiv.org/pdf/1709.09029][ Levin, S., & Yehudai, A. The co-evolution of test maintenance and code maintenance through the lens of fine-grained semantic changes. In IEEE International Conference on Software Maintenance and Evolution (ICSME) (pp. 35-46). IEEE. 2017.]]
 - [[file:../papers/Mining Software Repositories to Study Co-Evolution of Production & Test Cod.pdf][pdf]] [[https://link.springer.com/article/10.1007/s10664-010-9143-7][Zaidman, A., Van Rompaey, B., van Deursen, A., & Demeyer, S. Studying the co-evolution of production and test code in open source and industrial developer test processes through repository mining. Empirical Software Engineering Journal, 16(3), 325-364. 2011.]]
 + [[file:../papers/Co-Evolution_of_Object-Oriented_Software_Design_an.pdf][pdf]] [[https://www.researchgate.net/profile/Kim_Mens/publication/226433519_Co-Evolution_of_Object-Oriented_Software_Design_and_Implementation/links/0fcfd50772447c85d2000000/Co-Evolution-of-Object-Oriented-Software-Design-and-Implementation.pdf][Co-evolution of object-oriented software design and implementation, T D'Hondt, K De Volder, K Mens, R Wuyts - Software Architectures and …, 2002 - Springer]] more
@@ -391,6 +1811,106 @@ bibliography:references.bib
 - http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=877A01775995830BB127116FB11BAB49?doi=10.1.1.323.3411&rep=rep1&type=pdf
 - [[https://cs.uwaterloo.ca/~m2nagapp/courses/CS846/1171/papers/hindle_icse12.pdf][Lossless compaction of model execution traces]]
 - [[https://livablesoftware.com/conflictjs-javascript-libraries-conflicts/]]
+* Analysis Method                                                  :noexport:
+# J Merge wih impact analysis
+# J and put this intro in the 
+This section will focus on the methods used to extract useful information from programs.
+# Impact of change.
+The main point of analyzing the program here is to measure the impact of changes,
+being capable of measuring it allow to find test that need to be repaired or relaunched.
+# Data for amplifying test.
+Analyzing code can also be usefull to havrest data and patterns cite:hindle2012naturalness that will allow to better amplify tests.
+In addition to static analysis, using the history of changes 
+and the behavior of the program during test might prove to allow
+improvements to the precision and performance of programming assistants.
+
+In the general case, analyzing programs is difficult.
+The whole stack from an algorithms to run is complex and diverse.
+In Effect there is many programming languages that use different paradigms.
+For each language many parsers and compilers exist.
+There is also many runtime and intermediate representations.
+It is thus important to find points in this stack where analysis are the most efficient.
+
+The static analysis is often the first choice when one want to analyze a particular program or project.
+In the best case scenario a static analysis can prove properties of a program for any given inputs. 
+Most domains of science and industry that needs to prove properties use language with rich types systems.
+But annotating programs can be tedious and lead to bugs.
+That is why analysis tools make heavy use of type inference to lighten the burden of type annotating.
+Yet type inference have its own limits as uncertainties lower the quality of types through the program.
+Refining those uncertainties is a major point to improve software quality.
+
+Static analysis makes semantic models(class diag,type sys,...).
+Dynamic analysis makes functional models (fsm,memory,...).
+
+# Reducing memory can dig out interesting info from programs while testing, some king of mutation testing
+
+Even if rich type systems are very useful for analysis,
+programs heavily constrained by types are less flexible, 
+demand more code and use more complex artifacts to alleviate types overhead.
+There is an obvious trade-off between development flexibility and ease of analysis.
+Making use of runtime can disambiguate uncertainties through programs
+and ensure properties with more precision.
+Combining both static and dynamic analysis offer the possibility to further improve code quality while improving flexibility. 
+*** Static analysis
+It requires type information (annotated or inferred).
+It can check properties on infinite domains in an exhaustive way.
+Prove to be efficient on simple programs but able to accept a large number of inputs.
+Type systems can be languages that don't have explicit annotated types,
+it is nonetheless possible to use type rules e.g. mono-type in C with everything is an int, can check for null dereferencing (that is dereferencing 0).
+To improve robustness and flexibility most analysis tools have types that match all types and types that match no types,
+in practice is allow incremental typing and type inference.
+
+Many tools exist to analyze programs statically, most of them only work on one language (typescript, compCert, spoon)
+while some try to be more agnostic (llvm, semantic, pandoc).
+Focusing on one language allow finer analysis but might not scale to multilanguage projects.
+While tools handling multiple language might work better on multilanguage projects,
+to leverage the quantity of work for each language such tools need an intermediate representations of programs.
+*** Dynamic analysis
+Particularly suitable for highly dynamic and not very typified languages.
+Cannot provide absolute guarantees on an infinite domain.
+As close as possible to the actual use of the program.
+Effective on potentially complex programs but accepting few inputs.
+
+JSFlow cite:hedin2014jsflow.
+cite:richards2010analysis.
+cite:andreasen2017survey.
+cite:jiang2006multiresolution.
+cite:beschastnikh2013unifying.
+*** Hybrid analysis
+In many future work of articles in the field, and in some minor contributions.
+Supports static analysis by providing information that is easily accessible to the runtime.
+Supports dynamic analysis by directing it to the sensitive points detected during static analysis.
+Use tests to collect information at runtime and improve inferences from static analysis.
+Use static analysis to detect pieces of sensitive programs and test and instrument them to better understand them and detect bugs.
+cite:andreasen2017survey
+**** Mutation testing
+Changer la syntaxe d'un programme tout en tentant concever la même semantique de façon à tester des cas particuliers et rendre le code plus robuste. 
+cite:mirshokraie2013efficient
+* Synonyms / Definitions                                           :noexport:
+- {Symbolic, Concollic, Abstract} Execution :: Executing a program on abstract values, opposed to concrete execution.
+- Mutation Testing :: modify tested code during tests to run tests faster, while keeping the bug kill high. Notion of killed and surviving mutant. Also a way of measuring tests quality through the introduction of bugs. 
+  Originally proposed by Hamlet in "Testing programs with the aid of a computer" IEEE SE 3 (1977).
+- Search Based Software Engineering (SBSE) :: search algo are used to maximize test goals and reduce testing costs.
+- Search Based Software Testing (SBST) :: is a branch of SBSE. expl in 7.1 of cite:anand2013orchestrated.
+- Dynamic Symbolic Execution (DSE) :: can be mixed with SBST.
+- {{Statement,Branch,Path} coverage, Mutation Adequacy} :: Related to the notion of test adequacy cite:zhu1997software.
+- {Fonctional,Semantic} model :: ?? way of representing things
+- {State Based} modeling :: ??
+- The infeasibility problem of model based testing :: ??
+- LMP :: ?? see dhondt
+- Aspect Oriented Programming (AOP) :: ?? dhondt
+- Depth First Order (DFO) :: Come from dataflow analysis domain.
+- Co-evolution of code and test :: bidirectional
+- corrective, perfective, and adaptive change :: as defined by Mockus et al. in "Identify reasons for software changes using historic databases", 2000
+- adequacy :: Memon et al. 2001 
+* Citations                                                        :noexport:
+** agnostic co-evolution
+#+BEGIN_QUOTE
+Java. While our ideas and the repair process easily gen-
+eralize to other languages and test frameworks, there is a
+substantial amount of engineering necessary to reimplement
+ReAssert for another language. -- cite:daniel2010test
+#+END_QUOTE
 * Journal                                                         :noexport:
 ** [2019-10-18 Fri]
 *** Meeting with Djamel and Arnaud
@@ -399,7 +1919,8 @@ then on the bibliographic report (constraints from head of M2 and methodology).
 For the methodology, the reading of paper is standard see RAS module and Martin Quinson personal page.
 Moreover I should use some search engine to find paper in a somewhat reproducible way then filter,
 exploring through related works is also useful.
-*** TODO test a refactoring miner on some js
+*** DEFERRED test a refactoring miner on some js
+    CLOSED: [2019-12-13 Fri 19:53]
 - just want move function at this point
 *** HALF read [[https://www.sciencedirect.com/science/article/pii/S016412121730198X][Djamel E. Khelladi, Reda Bendraou, Regina Hebig, Marie-Pierre Gervais: A semi-automatic maintenance and co-evolution of OCL constraints with (meta)model evolution. JSS 2017.]]
 challenges of OCL:
@@ -547,7 +2068,8 @@ at runtime in the second stage.
 Amazing to explain challenges of sloppy languages
 *** WAITING read [[file:../papers/more/Gyimesi-ICST-2019.pdf][pdf]] [[https://www.researchgate.net/profile/Andrea_Stocco2/publication/333681142_BUGSJS_A_Benchmark_of_JavaScript_Bugs/links/5cff58fda6fdccd13091d886/BUGSJS-A-Benchmark-of-JavaScript-Bugs.pdf][Gyimesi, Péter, et al. "Bugsjs: A benchmark of javascript bugs." 2019 12th IEEE Conference on Software Testing, Validation and Verification (ICST). IEEE, 2019.]]
 *** WAITING read [[file:../papers/more/pldi275-richards.pdf][pdf]] [[https://plg.uwaterloo.ca/~dynjs/pldi275-richards.pdf][Richards, Gregor, et al. "An analysis of the dynamic behavior of JavaScript programs." ACM Sigplan Notices. Vol. 45. No. 6. ACM, 2010.]]
-*** TODO think about using vector clock on traces
+*** DEFERRED think about using vector clock on traces
+    CLOSED: [2019-11-17 Sun 19:54]
 - need to identify nodes in traces (the host app should have that)
 - need to piggy bag or do independanly transmit vector clock through between nodes
 Partial orders of event can represent any program in parallel/event systems.
@@ -618,17 +2140,151 @@ Using diffs and branches (calls, conditions) get lines of codes impacted by chan
 - title chosen
 - plan at the section level
 - 
-*** TODO make feature model and result sub sections
-*** TODO send email to Djamel on Eric Fabre's course i.e. MAD
-*** TODO get new paper from Djamel through email 
+*** STARTED make feature model and result sub sections
+*** DONE send email to Djamel on Eric Fabre's course i.e. MAD
+    CLOSED: [2019-12-13 Fri 11:35]
+*** DONE get new paper from Djamel through email 
+    CLOSED: [2019-12-17 Tue 19:55]
 - coverage survey
 - his survey on models' co-evolution
 - survey on types of tests
+** [2019-12-17 Tue]
+*** STARTED find multilanguage tools
+llvm
+semantic
+pandoc
+*** DEFERRED find vocabulary/article for type systems (Top/Bottom, mono-type)
+    CLOSED: [2020-01-08 Wed 19:55]
+*** DEFERRED find vocabulary/article on llvm intermediate representation idem for semantic and pandoc
+    CLOSED: [2020-01-08 Wed 19:55]
+*** TODO ask if its ok to cite more project on static ana and more paper on dyn ana
+*** TODO some ideas
+**** static ana to construct partial automata
+#+BEGIN_SRC js
+function f(a){
+  g0()
+  g01(g02())
+  if(g1()){
+    g2()
+    g3()
+  }else{
+    g4()
+    if(g5())
+      return g51()
+  }
+  g6()
+  return g7()
+}
+#+END_SRC
+#+BEGIN_EXAMPLE
+Automata file:1:0:10:1 f {
+<start> -> 2:5 // g0
+2:5 -> 3:10 // g0 -> g02
+3:10 -> 3:6
+3:6 -> 4:8
+4:8 -> 5:7
+5:7 -> 6:7
+4:8 -> 8:7
+8:7 -> 9:7
+9:7 -> 10:14
+10:14 -> <fin>
+6:6 -> 12:5
+12:5 -> 13:12
+13:12 -> <end>
+}
+#+END_EXAMPLE
+#+BEGIN_EXAMPLE
+f<start> -> 2:5 g0 ->* g0 2:5 -> 3:10 g02 ->* g02 3:10 -> 3:6 g01 ->* g01 3:6 -> 4:8 g1 ->* g1 4:8 -> 5:7
+                                                                                                   -> 8:7  
+#+END_EXAMPLE
+#+BEGIN_EXAMPLE
+function f(a){
+   instrument(g0,g01,g02,g1,g3,g4,g5,g51,g6,g7)
+   ...
+#+END_EXAMPLE
+**** specialisation of unit tests to users
+keep private data local.
+improve confidence of user about software quality.
+detect more bugs
+** [2020-01-08 Wed]
+*** STARTED agree with Djamel on some vocabulary
+**** api/model/code/tests
+- axis
+- type of artifact
+- vertex of a tetrahedron
+**** 
+*** STARTED read refminer
+*** STARTED get Detecting complex changes and refactorings during (Meta)model evolution.
+** [2020-01-14 Tue]
+*** CANCELLED ask type of changes put back in feature model
+    CLOSED: [2020-01-14 Tue 17:57] deffinetly no spliting papers other than empirical statistical studies
+perfective, ...
+
+in levin201X
+
+classify what should be co-evolved or not?
+*** STARTED read cite:daniel2010test, On Test Repair Using Symbolic Execution
+Update string literals used in oracles.
+
+#+BEGIN_QUOTE
+Java. While our ideas and the repair process easily gen-
+eralize to other languages and test frameworks, there is a
+substantial amount of engineering necessary to reimplement
+ReAssert for another language. -- cite:daniel2010test
+#+END_QUOTE
+**** prev
+ReAssert
+**** related works
+#+BEGIN_QUOTE
+Our work applies symbolic execution to the domain of test
+repair and attempts to find tests that pass. Most other ap-
+plications of symbolic execution take the opposite approach:
+they attempt to find test failures [5, 37, 39, 49]. Other re-
+searchers have applied symbolic execution to invariant de-
+tection [12, 29], security testing [19, 30, 53], string verifica-
+tion [54], and a host of other domains.
+#+END_QUOTE
+
+*** DEFERRED report bug in org-table formating cite: while outputing as table
+    CLOSED: [2020-01-15 Wed 18:57]
+*** TODO read 
+*** TODO bug dhondt2002 should have been published in 2000 not 2002
+*** DONE send runtime conf multi lang
+    CLOSED: [2020-01-23 Thu 00:10]
+** [2020-01-21 Tue]
+*** DONE send to fleep bluetooth conf
+    CLOSED: [2020-01-23 Thu 00:10]
+*** DONE get git link from djamel on some project for the  introdution
+    CLOSED: [2020-01-23 Thu 00:10]
+*** TODO is it viable to use fixed calls to fix more calls
+#+BEGIN_SRC typescript
+f(4)
+
+function f(){}
+
+f(9)
+#+END_SRC
+move + rename = no trivial co-evolution
+#+BEGIN_SRC typescript
+g(4)
+
+f(9)
+
+function g(){}
+#+END_SRC
+but if we make use of the change of =f(4)= to =g(4)= it is possible to infer the relation f -> g
 * Emacs Settings                                                   :noexport:
 #    (ox-extras-activate '(ignore-headlines))
+# :ignore: ignore current headline while promoting children
+#    (ox-extras-activate '(latex-header-blocks))
+# #+header: :header yes  # promote next latex block to headlines
+#    (require 'org-latex)
+#    (add-to-list 'org-export-latex-custom-lang-environments '((typescript "typescript")))
 Local Variables:
+eval:    (require 'ox-extra)
+eval:    (ox-extras-activate '(ignore-headlines))
 eval:    (setq org-confirm-babel-evaluate nil)
-eval:    (org-babel-do-load-languages 'org-babel-load-languages '( (shell . t) (R . t) (perl . t) (ditaa . t) ))
+eval:    (org-babel-do-load-languages 'org-babel-load-languages '( (shell . t) (R . t) (perl . t) (ditaa . t) (typescript . t) (js . t) ))
 eval:    (setq org-latex-listings 'minted)
 eval:    (add-to-list 'org-latex-packages-alist '("" "minted"))
 eval:    (setq org-src-fontify-natively t)
@@ -637,5 +2293,7 @@ eval:    (unless (boundp 'org-latex-classes) (setq org-latex-classes nil))
 eval:    (setq org-latex-with-hyperref nil)
 eval:    (add-to-list 'org-latex-classes '("llncs" "\\documentclass{llncs}\n \[NO-DEFAULT-PACKAGES]\n \[EXTRA]\n"  ("\\section{%s}" . "\\section*{%s}") ("\\subsection{%s}" . "\\subsection*{%s}")                       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")                       ("\\paragraph{%s}" . "\\paragraph*{%s}")                       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 eval:    (add-to-list 'org-latex-classes '("sdm" "\\documentclass{sdm}\n \[NO-DEFAULT-PACKAGES]\n \[EXTRA]\n"  ("\\section{%s}" . "\\section*{%s}") ("\\subsection{%s}" . "\\subsection*{%s}")                       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")                       ("\\paragraph{%s}" . "\\paragraph*{%s}")                       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+eval:    (defun delete-org-comments (backend) (loop for comment in (reverse (org-element-map (org-element-parse-buffer) 'comment 'identity)) do (setf (buffer-substring (org-element-property :begin comment) (org-element-property :end comment))"")))
+eval:    (add-hook 'org-export-before-processing-hook 'delete-org-comments)
 eval:    (setq org-latex-pdf-process (list "latexmk -bibtex -shell-escape -f -pdf %F"))
 End:
