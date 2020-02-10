@@ -1,1 +1,3 @@
 |evolution|ref|paradigm|description|availability|
+|---------+---+--------+-----------+------------|
+|rename   |martinez2019coming|OO+Class|compose del & add|https://github.com/SpoonLabs/coming|
