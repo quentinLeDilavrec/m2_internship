@@ -5,11 +5,13 @@ From files versions, commits,... , it should produce atomic evolutions.
 
 - Semantic
 - Refminer
+- Spoon https://github.com/INRIA/spoon
 
 ## Composition of Evolutions
 From atomic evolutions and other data, it should compose evolutions.
 
 - Refminer
+- Coming https://github.com/SpoonLabs/coming
 
 ## Impact Analysis
 Given evolutions, it should associate impacted tests.
